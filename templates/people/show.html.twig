@@ -35,6 +35,12 @@
                 <th>HomeDirectory</th>
                 <td>{{ person.homeDirectory }}</td>
             </tr>
+            {% for netgroup in netgroups %}
+            <tr>
+                <th>Netgroup</th>
+                <td>{{ netgroup.name }}</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 

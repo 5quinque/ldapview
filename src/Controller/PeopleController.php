@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\People;
+use App\Entity\Netgroup;
 use App\Form\PeopleType;
 use App\Repository\PeopleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,8 +54,11 @@ class PeopleController extends AbstractController
      */
     public function show(People $person): Response
     {
+        $netgroups = $person->getNetgroup();
+
         return $this->render('people/show.html.twig', [
             'person' => $person,
+            'netgroups' => $netgroups->toArray(),
         ]);
     }
 

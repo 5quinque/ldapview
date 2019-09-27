@@ -30,6 +30,10 @@ class Netgroup
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\People", mappedBy="netgroup")
+     * @ORM\JoinTable(name="people_netgroup",
+     *      joinColumns={@ORM\JoinColumn(name="netgroup_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="people_id", referencedColumnName="id")}
+     *      )
      */
     private $people;
 
