@@ -25,7 +25,8 @@ class PeopleType extends AbstractType
                 'choice_label' => function ($netgroup) {
                     return $netgroup->getName();
                 },
-		'multiple' => true
+                'multiple' => true,
+                'required' => false,
             ])
         ;
     }

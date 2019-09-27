@@ -15,13 +15,13 @@ class NetgroupType extends AbstractType
     {
         $builder
             ->add('name')
-            //->add('host')
             ->add('people', EntityType::class, [
                 'class' => People::class,
                 'choice_label' => function ($people) {
                     return $people->getUid();
                 },
-		'multiple' => true
+                'multiple' => true,
+                'required' => false,
             ])
         ;
     }
