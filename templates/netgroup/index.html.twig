@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Netgroup index{% endblock %}
+
+{% block body %}
+    <h1>Netgroup index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for netgroup in netgroups %}
+            <tr>
+                <td>{{ netgroup.id }}</td>
+                <td>{{ netgroup.name }}</td>
+                <td>
+                    <a href="{{ path('netgroup_show', {'id': netgroup.id}) }}">show</a>
+                    <a href="{{ path('netgroup_edit', {'id': netgroup.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('netgroup_new') }}">Create new</a>
+{% endblock %}

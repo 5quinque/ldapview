@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Netgroup{% endblock %}
+
+{% block body %}
+    <h1>Edit Netgroup</h1>
+
+    {{ include('netgroup/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('netgroup_index') }}">back to list</a>
+
+    {{ include('netgroup/_delete_form.html.twig') }}
+{% endblock %}
