@@ -3,9 +3,15 @@
 {% block title %}New People{% endblock %}
 
 {% block body %}
-    <h1>Create new People</h1>
-
-    {{ include('people/_form.html.twig') }}
-
-    <a href="{{ path('people_index') }}">back to list</a>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Create New Person</h1>
+            <a href="{{ path('people_index') }}"
+               class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                        class="fas fa-arrow-alt-circle-left fa-sm text-white-50"></i> back to list</a>
+        </div>
+        {{ include('people/_form.html.twig', {'form_title': 'Create New Person'}) }}
+    </div>
 {% endblock %}

@@ -15,12 +15,18 @@
                 <th>Name</th>
                 <td>{{ netgroup.name }}</td>
             </tr>
+            {% for person in people %}
+                <tr>
+                    <th>Person</th>
+                    <td>{{ person.uid }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('netgroup_index') }}">back to list</a>
 
-    <a href="{{ path('netgroup_edit', {'id': netgroup.id}) }}">edit</a>
+    <a href="{{ path('netgroup_edit', {'name': netgroup.name}) }}">edit</a>
 
     {{ include('netgroup/_delete_form.html.twig') }}
 {% endblock %}

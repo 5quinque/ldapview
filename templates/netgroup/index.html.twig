@@ -1,35 +1,72 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Netgroup index{% endblock %}
+{% block title %}Netgroup{% endblock %}
 
 {% block body %}
-    <h1>Netgroup index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for netgroup in netgroups %}
-            <tr>
-                <td>{{ netgroup.id }}</td>
-                <td>{{ netgroup.name }}</td>
-                <td>
-                    <a href="{{ path('netgroup_show', {'id': netgroup.id}) }}">show</a>
-                    <a href="{{ path('netgroup_edit', {'id': netgroup.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Netgroup</h1>
+            <a href="{{ path('netgroup_new') }}"
+               class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                        class="fas fa-user-plus fa-sm text-white-50"></i> New Netgroup</a>
+        </div>
+        <!-- Area Chart -->
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Netgroup</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">`
+                        <div class="col-sm-12 col-md-6">
+                            <div class="dataTables_length" id="dataTable_length"><label>Show entries <select
+                                            name="dataTable_length" aria-controls="dataTable"
+                                            class="custom-select custom-select-sm form-control form-control-sm">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                    </select></label></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <table class="table table-striped table-borderless table-hover">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for netgroup in netgroups %}
+                                <tr>
+                                    <td>{{ netgroup.name }}</td>
+                                    <td class="text-right">
+                                        <a class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm"
+                                           href="{{ path('netgroup_show', {'name': netgroup.name}) }}"><i
+                                                    class="fas fa-expand-arrows-alt fa-sm text-white-50"></i> show</a>
+                                        <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+                                           href="{{ path('netgroup_edit', {'name': netgroup.name}) }}"><i
+                                                    class="fas fa-user-edit fa-sm text-white-50"></i> edit</a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="2">no records found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% include('netgroup/_pagination.html.twig') %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('netgroup_new') }}">Create new</a>
+
 {% endblock %}

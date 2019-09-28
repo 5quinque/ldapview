@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\People;
-use App\Entity\Netgroup;
 use App\Form\PeopleType;
 use App\Repository\PeopleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @Route("/people")
@@ -17,12 +17,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class PeopleController extends AbstractController
 {
     /**
-     * @Route("/", name="people_index", methods={"GET"})
+     * @Route("/{page_no<\d+>?0}", name="people_index", methods={"GET"})
      */
-    public function index(PeopleRepository $peopleRepository): Response
+    public function index(PeopleRepository $peopleRepository, int $page_no): Response
     {
+//        $people = $peopleRepository->findBy(
+//            [],
+//            array('id' => 'ASC'),
+//            10,
+//            ($page_no * 10),
+//            );
+        $page_size = 10;
+
+        $query = $peopleRepository->createQueryBuilder('p')->getQuery();
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
+
+        $people_count = $paginator->count();
+        $page_count = (int) floor($people_count / $page_size);
+        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
+
+        $people = [];
+        foreach ($paginator as $person) {
+            $people[] = $person;
+        }
+
         return $this->render('people/index.html.twig', [
-            'people' => $peopleRepository->findAll(),
+            'people' => $people,
+            'page_count' => $page_count,
+            'people_count' => $people_count,
         ]);
     }
 
@@ -50,7 +72,7 @@ class PeopleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="people_show", methods={"GET"})
+     * @Route("/{uid}", name="people_show", methods={"GET"})
      */
     public function show(People $person): Response
     {
@@ -63,7 +85,7 @@ class PeopleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="people_edit", methods={"GET","POST"})
+     * @Route("/{uid}/edit", name="people_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, People $person): Response
     {
@@ -83,7 +105,7 @@ class PeopleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="people_delete", methods={"DELETE"})
+     * @Route("/{uid}", name="people_delete", methods={"DELETE"})
      */
     public function delete(Request $request, People $person): Response
     {

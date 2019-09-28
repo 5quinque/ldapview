@@ -16,13 +16,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class NetgroupController extends AbstractController
 {
     /**
-     * @Route("/", name="netgroup_index", methods={"GET"})
+     * @Route("/{page_no<\d+>?0}", name="netgroup_index", methods={"GET"})
      */
-    public function index(NetgroupRepository $netgroupRepository): Response
+    public function index(NetgroupRepository $netgroupRepository, int $page_no): Response
     {
+//        return $this->render('netgroup/index.html.twig', [
+//            'netgroups' => $netgroupRepository->findAll(),
+//        ]);
+
+        $page_size = 10;
+
+        $query = $netgroupRepository->createQueryBuilder('p')->getQuery();
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
+
+        $netgroup_count = $paginator->count();
+        $page_count = (int) floor($netgroup_count / $page_size);
+        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
+
+        $netgroups = [];
+        foreach ($paginator as $netgroup) {
+            $netgroups[] = $netgroup;
+        }
+
         return $this->render('netgroup/index.html.twig', [
-            'netgroups' => $netgroupRepository->findAll(),
+            'netgroups' => $netgroups,
+            'page_count' => $page_count,
+            'netgroup_count' => $netgroup_count,
         ]);
+
     }
 
     /**
@@ -49,17 +70,20 @@ class NetgroupController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="netgroup_show", methods={"GET"})
+     * @Route("/{name}", name="netgroup_show", methods={"GET"})
      */
     public function show(Netgroup $netgroup): Response
     {
+        $people = $netgroup->getPeople();
+
         return $this->render('netgroup/show.html.twig', [
             'netgroup' => $netgroup,
+            'people' => $people,
         ]);
     }
 
     /**
-     * @Route("/{id}/edit", name="netgroup_edit", methods={"GET","POST"})
+     * @Route("/{name}/edit", name="netgroup_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Netgroup $netgroup): Response
     {
@@ -79,7 +103,7 @@ class NetgroupController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="netgroup_delete", methods={"DELETE"})
+     * @Route("/{name}", name="netgroup_delete", methods={"DELETE"})
      */
     public function delete(Request $request, Netgroup $netgroup): Response
     {

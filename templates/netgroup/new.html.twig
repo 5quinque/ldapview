@@ -3,9 +3,15 @@
 {% block title %}New Netgroup{% endblock %}
 
 {% block body %}
-    <h1>Create new Netgroup</h1>
-
-    {{ include('netgroup/_form.html.twig') }}
-
-    <a href="{{ path('netgroup_index') }}">back to list</a>
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Create new Netgroup</h1>
+            <a href="{{ path('netgroup_index') }}"
+               class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                        class="fas fa-arrow-alt-circle-left fa-sm text-white-50"></i> back to list</a>
+        </div>
+        {{ include('netgroup/_form.html.twig') }}
+    </div>
 {% endblock %}
