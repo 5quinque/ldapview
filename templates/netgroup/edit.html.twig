@@ -3,11 +3,17 @@
 {% block title %}Edit Netgroup{% endblock %}
 
 {% block body %}
-    <h1>Edit Netgroup</h1>
-
-    {{ include('netgroup/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('netgroup_index') }}">back to list</a>
-
-    {{ include('netgroup/_delete_form.html.twig') }}
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Edit Netgroup</h1>
+            <a href="{{ path('netgroup_index') }}"
+               class="d-none d-sm-inline-block btn btn-sm btn-primary btn-icon-split shadow-sm"><span
+                        class="icon text-white-50"><i
+                            class="fas fa-arrow-alt-circle-left"></i></span><span class="text">Back to list</span></a>
+        </div>
+        {{ include('netgroup/_form.html.twig', {'form_title': 'Edit Netgroup', 'button_label': 'Update'}) }}
+        {{ include('netgroup/_delete_form.html.twig') }}
+    </div>
 {% endblock %}
