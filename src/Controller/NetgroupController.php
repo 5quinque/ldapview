@@ -69,6 +69,15 @@ class NetgroupController extends AbstractController
         ]);
     }
 
+    public function newFromScript(string $name) {
+        $netgroup = new Netgroup();
+        $netgroup->setName($name);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($netgroup);
+        $entityManager->flush();
+    }
+
     /**
      * @Route("/{name}", name="netgroup_show", methods={"GET"})
      */

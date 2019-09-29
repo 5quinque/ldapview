@@ -21,12 +21,6 @@ class PeopleController extends AbstractController
      */
     public function index(PeopleRepository $peopleRepository, int $page_no): Response
     {
-//        $people = $peopleRepository->findBy(
-//            [],
-//            array('id' => 'ASC'),
-//            10,
-//            ($page_no * 10),
-//            );
         $page_size = 10;
 
         $query = $peopleRepository->createQueryBuilder('p')->getQuery();
