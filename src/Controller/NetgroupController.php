@@ -20,17 +20,18 @@ class NetgroupController extends AbstractController
      */
     public function index(NetgroupRepository $netgroupRepository, int $page_no): Response
     {
-//        return $this->render('netgroup/index.html.twig', [
-//            'netgroups' => $netgroupRepository->findAll(),
-//        ]);
-
         $page_size = 10;
+
+        if (isset($_GET["limit"])) {
+            if (preg_match('/^\d+$/', $_GET["limit"]))
+                $page_size = $_GET["limit"];
+        }
 
         $query = $netgroupRepository->createQueryBuilder('p')->getQuery();
         $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
 
         $netgroup_count = $paginator->count();
-        $page_count = (int) floor($netgroup_count / $page_size);
+        $page_count = (int)floor($netgroup_count / $page_size);
         $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
 
         $netgroups = [];
@@ -42,8 +43,8 @@ class NetgroupController extends AbstractController
             'netgroups' => $netgroups,
             'page_count' => $page_count,
             'netgroup_count' => $netgroup_count,
+            'limit' => $page_size,
         ]);
-
     }
 
     /**
@@ -69,25 +70,18 @@ class NetgroupController extends AbstractController
         ]);
     }
 
-    public function newFromScript(string $name) {
-        $netgroup = new Netgroup();
-        $netgroup->setName($name);
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($netgroup);
-        $entityManager->flush();
-    }
-
     /**
      * @Route("/{name}", name="netgroup_show", methods={"GET"})
      */
     public function show(Netgroup $netgroup): Response
     {
         $people = $netgroup->getPeople();
+        $hosts = $netgroup->getHost();
 
         return $this->render('netgroup/show.html.twig', [
             'netgroup' => $netgroup,
             'people' => $people,
+            'hosts' => $hosts,
         ]);
     }
 
@@ -116,7 +110,7 @@ class NetgroupController extends AbstractController
      */
     public function delete(Request $request, Netgroup $netgroup): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$netgroup->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $netgroup->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($netgroup);
             $entityManager->flush();

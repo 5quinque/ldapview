@@ -23,6 +23,11 @@ class PeopleController extends AbstractController
     {
         $page_size = 10;
 
+        if (isset($_GET["limit"])) {
+            if (preg_match('/^\d+$/', $_GET["limit"]))
+                $page_size = $_GET["limit"];
+        }
+
         $query = $peopleRepository->createQueryBuilder('p')->getQuery();
         $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
 
@@ -39,6 +44,7 @@ class PeopleController extends AbstractController
             'people' => $people,
             'page_count' => $page_count,
             'people_count' => $people_count,
+            'limit' => $page_size,
         ]);
     }
 

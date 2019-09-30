@@ -1,9 +1,6 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Netgroup{% endblock %}
-
 {% block body %}
-
     <!-- Begin Page Content -->
     <div class="container-fluid">
         <!-- Page Heading -->
@@ -24,14 +21,16 @@
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="row">`
+                    <div class="row">
                         <div class="col-sm-12 col-md-6">
-                            <div class="dataTables_length" id="dataTable_length"><label>Show entries <select
+                            <div class="dataTables_length"><label>Show entries <select
+                                            id="limit"
                                             name="dataTable_length" aria-controls="dataTable"
                                             class="custom-select custom-select-sm form-control form-control-sm">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
+                                        <option value="10" {{ limit == 10 ? 'selected' }}>10</option>
+                                        <option value="25" {{ limit == 25 ? 'selected' }}>25</option>
+                                        <option value="50" {{ limit == 50 ? 'selected' }}>50</option>
+                                        <option value="100" {{ limit == 100 ? 'selected' }}>100</option>
                                     </select></label></div>
                         </div>
                     </div>
@@ -72,6 +71,12 @@
             </div>
         </div>
     </div>
-
-
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $("#limit").on('change', function (e) {
+            console.log(this);
+            self.location.href = `?limit=${this.value}`;
+        });
+    </script>
 {% endblock %}

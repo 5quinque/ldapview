@@ -30,3 +30,8 @@ div.dataTables_filter input {
 .pagination {
     margin-bottom: unset;
 }
+.table-netgroup-scroll {
+    position: relative;
+    max-height: 600px;
+    overflow: auto;
+}
