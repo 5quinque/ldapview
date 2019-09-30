@@ -29,10 +29,10 @@ class PeopleController extends AbstractController
         }
 
         $query = $peopleRepository->createQueryBuilder('p')->getQuery();
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $people_count = $paginator->count();
-        $page_count = (int) floor($people_count / $page_size);
+        $page_count = (int)floor($people_count / $page_size);
         $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
 
         $people = [];
@@ -62,7 +62,7 @@ class PeopleController extends AbstractController
             $entityManager->persist($person);
             $entityManager->flush();
 
-            return $this->redirectToRoute('people_index');
+            return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }
 
         return $this->render('people/new.html.twig', [
@@ -95,7 +95,7 @@ class PeopleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('people_index');
+            return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }
 
         return $this->render('people/edit.html.twig', [
@@ -109,7 +109,7 @@ class PeopleController extends AbstractController
      */
     public function delete(Request $request, People $person): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$person->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $person->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($person);
             $entityManager->flush();

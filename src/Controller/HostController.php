@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,7 +27,7 @@ class HostController extends AbstractController
         }
 
         $query = $hostRepository->createQueryBuilder('p')->getQuery();
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $host_count = $paginator->count();
         $page_count = (int) floor($host_count / $page_size);

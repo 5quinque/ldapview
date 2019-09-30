@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class NetgroupType extends AbstractType
 {
@@ -20,6 +21,7 @@ class NetgroupType extends AbstractType
                 'choice_label' => function ($people) {
                     return $people->getUid();
                 },
+                'by_reference' => false,
                 'multiple' => true,
                 'required' => false,
             ])

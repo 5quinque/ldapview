@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Entity\Netgroup;
 use App\Form\NetgroupType;
 use App\Repository\NetgroupRepository;
@@ -28,7 +29,7 @@ class NetgroupController extends AbstractController
         }
 
         $query = $netgroupRepository->createQueryBuilder('p')->getQuery();
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query, $fetchJoinCollection = true);
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $netgroup_count = $paginator->count();
         $page_count = (int)floor($netgroup_count / $page_size);
@@ -61,7 +62,7 @@ class NetgroupController extends AbstractController
             $entityManager->persist($netgroup);
             $entityManager->flush();
 
-            return $this->redirectToRoute('netgroup_index');
+            return $this->redirectToRoute('netgroup_show', ['name' => $netgroup->getName()]);
         }
 
         return $this->render('netgroup/new.html.twig', [
@@ -96,7 +97,7 @@ class NetgroupController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('netgroup_index');
+            return $this->redirectToRoute('netgroup_show', ['name' => $netgroup->getName()]);
         }
 
         return $this->render('netgroup/edit.html.twig', [
