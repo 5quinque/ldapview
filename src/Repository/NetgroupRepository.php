@@ -19,6 +19,15 @@ class NetgroupRepository extends ServiceEntityRepository
         parent::__construct($registry, Netgroup::class);
     }
 
+    public function findByLike($query)
+    {
+        return $this->createQueryBuilder('n')
+           ->where('n.name LIKE :query')
+           ->setParameter('query', "%$query%")
+           ->getQuery()
+           ->getResult();
+    }
+
     // /**
     //  * @return Netgroup[] Returns an array of Netgroup objects
     //  */

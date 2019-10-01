@@ -19,6 +19,15 @@ class PeopleRepository extends ServiceEntityRepository
         parent::__construct($registry, People::class);
     }
 
+    public function findByLike($query)
+    {
+        return $this->createQueryBuilder('p')
+           ->where('p.uid LIKE :query')
+           ->setParameter('query', "%$query%")
+           ->getQuery()
+           ->getResult();
+    }
+
     // /**
     //  * @return People[] Returns an array of People objects
     //  */

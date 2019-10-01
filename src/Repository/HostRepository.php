@@ -19,6 +19,15 @@ class HostRepository extends ServiceEntityRepository
         parent::__construct($registry, Host::class);
     }
 
+    public function findByLike($query)
+    {
+        return $this->createQueryBuilder('h')
+           ->where('h.name LIKE :query')
+           ->setParameter('query', "%$query%")
+           ->getQuery()
+           ->getResult();
+    }
+
     // /**
     //  * @return Host[] Returns an array of Host objects
     //  */

@@ -27,6 +27,8 @@ class PeopleType extends AbstractType
                 },
                 'multiple' => true,
                 'required' => false,
+                'attr' => array('class'=>'selectpicker',
+                    'data-live-search' => 'true', 'data-actions-box' => 'true'),
             ])
         ;
     }

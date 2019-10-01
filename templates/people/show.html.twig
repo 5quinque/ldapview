@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 {% block title %}People{% endblock %}
-{% dump hosts %}
 {% block body %}
     <!-- Begin Page Content -->
     <div class="container-fluid">
@@ -24,10 +23,6 @@
                         <div class="row">
                             <table class="table">
                                 <tbody>
-                                <tr>
-                                    <th>Id</th>
-                                    <td>{{ person.id }}</td>
-                                </tr>
                                 <tr>
                                     <th>Type</th>
                                     <td>{{ person.type }}</td>
