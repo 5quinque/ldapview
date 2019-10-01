@@ -10,7 +10,8 @@
             <a href="{{ path('people_new') }}"
                class="d-none d-sm-inline-block btn btn-sm btn-primary btn-icon-split shadow-sm"><span
                         class="icon text-white-50"><i
-                            class="fas fa-user-plus fa-sm text-white-50"></i></span><span class="text">New User</span></a>
+                            class="fas fa-user-plus fa-sm text-white-50"></i></span><span
+                        class="text">New User</span></a>
         </div>
         <!-- Area Chart -->
         <div class="col-xl-12 col-lg-12">
@@ -56,16 +57,18 @@
                                     <td>{{ person.uidNumber }}</td>
                                     <td>{{ person.gidNumber }}</td>
                                     <td>{{ person.homeDirectory }}</td>
-                                    <td class="text-right">
-                                        <a class="d-none d-sm-inline-block btn btn-sm btn-info btn-icon-split shadow-sm"
+                                    <td class="justify-content-end d-flex">
+                                        <a class="d-none d-sm-inline-block btn btn-sm btn-info btn-icon-split shadow-sm mr-2"
                                            href="{{ path('people_show', {'uid': person.uid}) }}"><span
                                                     class="icon text-white-50"><i
                                                         class="fas fa-expand-arrows-alt"></i></span><span class="text">Show</span></a>
-                                        <a class="d-none d-sm-inline-block btn btn-sm btn-primary btn-icon-split shadow-sm"
+                                        <a class="d-none d-sm-inline-block btn btn-sm btn-primary btn-icon-split shadow-sm mr-2"
                                            href="{{ path('people_edit', {'uid': person.uid}) }}"><span
                                                     class="icon text-white-50"><i
                                                         class="fas fa-user-edit"></i></span><span
-                                                    class="text">Edit</span></a>                                    </td>
+                                                    class="text">Edit</span></a>
+                                        {{ include('people/_delete_form.html.twig') }}
+                                    </td>
                                 </tr>
                             {% else %}
                                 <tr>
