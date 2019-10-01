@@ -53,9 +53,15 @@ class HostController extends AbstractController
     {
         $netgroups = $host->getNetgroups();
 
+        $people = [];
+        foreach($netgroups as $netgroup) {
+            $people[$netgroup->getName()] = $netgroup->getPeople()->toArray();
+        }
+
         return $this->render('host/show.html.twig', [
             'host' => $host,
             'netgroups' => $netgroups,
+            'people' => $people,
         ]);
     }
 }
