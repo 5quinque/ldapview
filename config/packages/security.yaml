@@ -10,7 +10,6 @@ security:
         default_roles: ROLE_USER
         uid_key: uid
         password_attribute: 'userPassword'
-    in_memory: { memory: null }
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/

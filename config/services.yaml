@@ -10,7 +10,7 @@ services:
         arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
-            - host: '%env(string:LDAP_HOST)%'
+            - host: '%env(LDAP_HOST)%'
               port: 389
               encryption: none
               options:

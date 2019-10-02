@@ -93,9 +93,6 @@
     "egulias/email-validator": {
         "version": "2.1.11"
     },
-    "fig/link-util": {
-        "version": "1.0.0"
-    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
@@ -178,9 +175,6 @@
     "symfony/css-selector": {
         "version": "v4.3.4"
     },
-    "symfony/debug": {
-        "version": "v4.3.4"
-    },
     "symfony/debug-bundle": {
         "version": "4.1",
         "recipe": {
@@ -207,6 +201,12 @@
     },
     "symfony/dotenv": {
         "version": "v4.3.4"
+    },
+    "symfony/error-handler": {
+        "version": "5.0-dev"
+    },
+    "symfony/error-renderer": {
+        "version": "5.0-dev"
     },
     "symfony/event-dispatcher": {
         "version": "v4.3.4"
@@ -513,8 +513,5 @@
     },
     "zendframework/zend-code": {
         "version": "3.3.2"
-    },
-    "zendframework/zend-eventmanager": {
-        "version": "3.2.1"
     }
 }
