@@ -15,6 +15,20 @@ class User implements UserInterface
      */
     private $password;
 
+    private $gecos;
+
+    public function getGecos(): string
+    {
+        return $this->gecos;
+    }
+
+    public function setGecos(string $gecos): self
+    {
+        $this->gecos = $gecos;
+
+        return $this;
+    }
+
     public function getUid(): ?string
     {
         return $this->uid;
