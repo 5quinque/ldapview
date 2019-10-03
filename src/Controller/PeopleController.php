@@ -25,14 +25,14 @@ class PeopleController extends AbstractController
         $ldap_person = $ldapService->findOneByUid($uid);
         $person = $peopleRepository->findOneBy(array('uid' => $uid));
         $netgroups = $person->getNetgroup();
-
         $hosts = [];
+
         foreach($netgroups as $netgroup) {
             $hosts[$netgroup->getName()] = $netgroup->getHost()->toArray();
         }
 
         return $this->render('people/test.html.twig', [
-            "person" => $ldap_person,
+            'person' => $ldap_person,
             'netgroups' => $netgroups->toArray(),
             'hosts' => $hosts,
         ]);

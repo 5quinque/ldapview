@@ -18,13 +18,18 @@ class LdapService
         $this->ldap->bind($_ENV['LDAP_USER'], $_ENV['LDAP_PASS']);
     }
 
-    public function findOneByUid(string $uid): object
+    public function findOneByUid(string $uid): ?object
     {
         $query = $this->ldap->query('dc=example,dc=org',
             "(&(ObjectClass=posixAccount)(uid={$uid}))",
             ["maxItems" => 1]
         );
 
-        return $query->execute()->toArray()[0];
+        $results = $query->execute();
+        if ($results->count() === 0) {
+            return null;
+        }
+
+        return current($results->toArray());
     }
 }
