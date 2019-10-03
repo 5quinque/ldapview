@@ -10,34 +10,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Request\PeopleParmConverter;
 use App\Service\LdapService;
+
 
 /**
  * @Route("/people")
  */
 class PeopleController extends AbstractController
-{
-
-    /**
-     * @Route("/test/{uid}", name="people_test")
-     */
-    public function test(LdapService $ldapService, PeopleRepository $peopleRepository, string $uid) {
-        $ldap_person = $ldapService->findOneByUid($uid);
-        $person = $peopleRepository->findOneBy(array('uid' => $uid));
-        $netgroups = $person->getNetgroup();
-        $hosts = [];
-
-        foreach($netgroups as $netgroup) {
-            $hosts[$netgroup->getName()] = $netgroup->getHost()->toArray();
-        }
-
-        return $this->render('people/test.html.twig', [
-            'person' => $ldap_person,
-            'netgroups' => $netgroups->toArray(),
-            'hosts' => $hosts,
-        ]);
-    }
-
+{  
     /**
      * @Route("/{page_no<\d+>?0}", name="people_index", methods={"GET"})
      */
