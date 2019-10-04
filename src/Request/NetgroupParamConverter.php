@@ -40,50 +40,36 @@ class NetgroupParamConverter implements ParamConverterInterface
     private $options = [];                                                           
    
 
-    public function __construct(NetgroupRepository $netgroupRepository, PeopleRepository $peopleRepository, ObjectManager $objectManager)
+    public function __construct(NetgroupRepository $netgroupRepository, PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapService $ldapService)
     {
         $this->netgroupRepository = $netgroupRepository;
         $this->peopleRepository = $peopleRepository;
         $this->om = $objectManager;
+        $this->ldapService = $ldapService;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        $ldapService = new LdapService();
-
         $name = $request->attributes->get('name');
         $netgroup = $this->netgroupRepository->findOneBy(array('name' => $name));
-        $ldap_netgroup = $ldapService->findOneByNetgroup($name);
+        $ldap_netgroup = $this->ldapService->findOneByNetgroup($name);
 
         if (is_null($ldap_netgroup)) {
-            // [todo] if $person exists, remove entity?
+            // [todo] if $netgroup exists, remove entity?
             throw new NotFoundHttpException("Netgroup not found in LDAP");
         }
         
         if (!$netgroup) {
-            $netgroup = new People();
-        }
-        
-        // Add these users to netgroup
-        foreach ($ldap_netgroup->getAttributes()["nisNetgroupTriple"] as $nis) {
-            //dump($nis);
-            preg_match('/^\(,(.+),.+\)$/', $nis, $matches);
-            if (empty($matches)) {
-                continue;
-            }
-            dump($matches[1]);
-            $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
-            //dump($person->toArray());
-            
-            if (!is_null($person)) {
-                // If person is null, try searching them in ldap and create new entity?
-                $netgroup->addPerson($person);
-            }
+            $netgroup = new Netgroup();
         }
 
-        $netgroup->setDescription(
-            current($ldap_netgroup->getAttributes()["description"])
-        );
+        $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
+        
+        if (isset($ldap_netgroup->getAttributes()["description"])) {
+            $netgroup->setDescription(
+                current($ldap_netgroup->getAttributes()["description"])
+            );
+        }
         
         $this->om->persist($netgroup);
         $this->om->flush();
@@ -93,6 +79,30 @@ class NetgroupParamConverter implements ParamConverterInterface
         $request->attributes->set($param, $netgroup);
 
         return true;
+    }
+
+    private function addUsers(Netgroup $netgroup, array $people)
+    {
+        // Add these users to netgroup
+        foreach ($people as $nis) {
+            preg_match('/^\(,(.+),.+\)$/', $nis, $matches);
+            if (empty($matches)) {
+                continue;
+            }
+            
+            $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
+
+            // If user isn't in database, check LDAP and create new entity
+            if (is_null($person)) {
+                $ldap_person = $this->ldapService->findOneByUid($matches[1]);
+                if (is_null($ldap_person)) {
+                    continue;
+                }
+                $person = $this->ldapService->createPersonEntity($ldap_person);                
+            }
+            $netgroup->addPerson($person);
+        }
+
     }
 
     public function supports(ParamConverter $configuration)

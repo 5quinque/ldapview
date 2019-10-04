@@ -36,19 +36,18 @@ class PeopleParamConverter implements ParamConverterInterface
     private $options = [];                                                           
    
 
-    public function __construct(PeopleRepository $peopleRepository, ObjectManager $objectManager)
+    public function __construct(PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapService $ldapService)
     {
         $this->peopleRepository = $peopleRepository;
         $this->om = $objectManager;
+        $this->ldapService = $ldapService;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        $ldapService = new LdapService();
-
         $uid = $request->attributes->get('uid');
         $person = $this->peopleRepository->findOneBy(array('uid' => $uid));
-        $ldap_person = $ldapService->findOneByUid($uid);
+        $ldap_person = $this->ldapService->findOneByUid($uid);
 
         if (is_null($ldap_person)) {
             // [todo] if $person exists, remove entity?
@@ -56,26 +55,10 @@ class PeopleParamConverter implements ParamConverterInterface
         }
         
         if (!$person) {
-            $person = new People();
+            $person = $this->ldapService->createPersonEntity($ldap_person);
+        } else {
+            $this->ldapService->updatePersonEntity($person, $ldap_person);
         }
-
-        $person->setUid($uid);
-        $person->setType("staff");
-        $person->setGecos(
-            current($ldap_person->getAttributes()["gecos"])
-        );
-        $person->setUidNumber(
-            current($ldap_person->getAttributes()["uidNumber"])
-        );
-        $person->setGidNumber(
-            current($ldap_person->getAttributes()["gidNumber"])
-        );
-        $person->setHomeDirectory(
-            current($ldap_person->getAttributes()["homeDirectory"])
-        );
-        
-        $this->om->persist($person);
-        $this->om->flush();
 
         $param = $configuration->getName();
         

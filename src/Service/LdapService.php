@@ -4,13 +4,15 @@ namespace App\Service;
 
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Entry;
+use Doctrine\Common\Persistence\ObjectManager;
+use App\Repository\PeopleRepository;
 use App\Entity\People;
 
 class LdapService
 {
     private $ldap;
 
-    public function __construct()
+    public function __construct(ObjectManager $objectManager, PeopleRepository $peopleRepository)
     {
         $this->ldap = Ldap::create('ext_ldap', [
             'host' => $_ENV['LDAP_HOST'],
@@ -18,6 +20,9 @@ class LdapService
         ]);
 
         $this->ldap->bind($_ENV['LDAP_USER'], $_ENV['LDAP_PASS']);
+
+        $this->om = $objectManager;
+        $this->peopleRepository = $peopleRepository;
     }
 
     public function persist(People $person)
@@ -36,6 +41,38 @@ class LdapService
         $entry->setAttribute('uidNumber', [$person->getUidNUmber()]);
         $entry->setAttribute('homeDirectory', [$person->getHomeDirectory()]);
         $entryManager->update($entry);
+    }
+
+    public function createPersonEntity(object $ldap_person): object
+    {
+        $person = new People();
+
+        return $this->updatePersonEntity($person, $ldap_person);
+    }
+
+    public function updatePersonEntity(People $person, object $ldap_person): object
+    {
+        $person->setUid(
+            current($ldap_person->getAttributes()["uid"])
+        );
+        $person->setType("staff");
+        $person->setGecos(
+            current($ldap_person->getAttributes()["gecos"])
+        );
+        $person->setUidNumber(
+            current($ldap_person->getAttributes()["uidNumber"])
+        );
+        $person->setGidNumber(
+            current($ldap_person->getAttributes()["gidNumber"])
+        );
+        $person->setHomeDirectory(
+            current($ldap_person->getAttributes()["homeDirectory"])
+        );
+        
+        $this->om->persist($person);
+        $this->om->flush();
+        
+        return $person;
     }
 
     public function findOneByUid(string $uid): ?object
