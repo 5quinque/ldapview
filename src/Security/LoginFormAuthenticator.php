@@ -71,6 +71,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user)
     {
+        // Check user is in cn=Directory Administrators
         $hash = $user->getPassword();
         $password = $credentials["password"];
 
