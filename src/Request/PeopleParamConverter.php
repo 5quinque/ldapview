@@ -48,34 +48,34 @@ class PeopleParamConverter implements ParamConverterInterface
 
         $uid = $request->attributes->get('uid');
         $person = $this->peopleRepository->findOneBy(array('uid' => $uid));
+        $ldap_person = $ldapService->findOneByUid($uid);
+
+        if (is_null($ldap_person)) {
+            // [todo] if $person exists, remove entity?
+            throw new NotFoundHttpException("User not found in LDAP");
+        }
         
         if (!$person) {
-            $ldap_person = $ldapService->findOneByUid($uid);
-
-            if (is_null($ldap_person)) {
-                throw new NotFoundHttpException();
-            }
-
             $person = new People();
-
-            $person->setUid($uid);
-            $person->setType("staff");
-            $person->setGecos(
-                current($ldap_person->getAttributes()["gecos"])
-            );
-            $person->setUidNumber(
-                current($ldap_person->getAttributes()["uidNumber"])
-            );
-            $person->setGidNumber(
-                current($ldap_person->getAttributes()["gidNumber"])
-            );
-            $person->setHomeDirectory(
-                current($ldap_person->getAttributes()["homeDirectory"])
-            );
-            
-            $this->om->persist($person);
-            $this->om->flush();
         }
+
+        $person->setUid($uid);
+        $person->setType("staff");
+        $person->setGecos(
+            current($ldap_person->getAttributes()["gecos"])
+        );
+        $person->setUidNumber(
+            current($ldap_person->getAttributes()["uidNumber"])
+        );
+        $person->setGidNumber(
+            current($ldap_person->getAttributes()["gidNumber"])
+        );
+        $person->setHomeDirectory(
+            current($ldap_person->getAttributes()["homeDirectory"])
+        );
+        
+        $this->om->persist($person);
+        $this->om->flush();
 
         $param = $configuration->getName();
         

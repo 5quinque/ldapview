@@ -96,13 +96,14 @@ class PeopleController extends AbstractController
     /**
      * @Route("/{uid}/edit", name="people_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, People $person): Response
+    public function edit(Request $request, People $person, LdapService $ldapService): Response
     {
         $form = $this->createForm(PeopleType::class, $person);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
+            $ldapService->persist($person);
 
             return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }
