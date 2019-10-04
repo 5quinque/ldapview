@@ -15,6 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use App\Service\LdapService;
 
 class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
@@ -22,11 +23,13 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     private $urlGenerator;
     private $csrfTokenManager;
+    private $ldapService;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager)
+    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, LdapService $ldapService)
     {
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->ldapService = $ldapService;
     }
 
     public function supports(Request $request)
@@ -57,12 +60,9 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             throw new InvalidCsrfTokenException();
         }
 
-        // Load / create our user however you need.
-        // You can do this by calling the user provider, or with custom logic here.
         $user = $userProvider->loadUserByUsername($credentials['uid']);
 
         if (!$user) {
-            // fail authentication with a custom error
             throw new CustomUserMessageAuthenticationException('Uid could not be found.');
         }
 
@@ -72,6 +72,11 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     public function checkCredentials($credentials, UserInterface $user)
     {
         // Check user is in cn=Directory Administrators
+        $isDirectoryAdmin = $this->ldapService->isDirectoryAdmin($user->getUsername());
+        if ($isDirectoryAdmin === false) {
+            throw new CustomUserMessageAuthenticationException('Directory Administrator privileges required.');
+        }
+        
         $hash = $user->getPassword();
         $password = $credentials["password"];
 

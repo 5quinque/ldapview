@@ -12,6 +12,17 @@ class LdapService
 {
     private $ldap;
 
+    public function isDirectoryAdmin($uid)
+    {
+        $query = $this->ldap->query('cn=Directory Administrators,dc=example,dc=org',
+            "uniqueMember=uid={$uid},ou=people,dc=example,dc=org"
+        );
+
+        $results = $query->execute();
+
+        return $results->count() === 1;
+    }
+
     public function __construct(ObjectManager $objectManager, PeopleRepository $peopleRepository)
     {
         $this->ldap = Ldap::create('ext_ldap', [
