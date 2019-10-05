@@ -74,10 +74,13 @@
                                     <tbody>
                                     {% for netgroup in netgroups %}
                                         <tr>
-                                            <th>Netgroup</th>
                                             <td>
                                                 <a href="{{ path('netgroup_show', {'name': netgroup.name}) }}">{{ netgroup.name }}</a>
                                             </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -108,6 +111,10 @@
                                             </td>
                                         </tr>
                                         {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
@@ -115,6 +122,38 @@
                         </div>
                     </div>
                 </div>
+                <div class="card shadow mb-4">
+                    <!-- Card Header -->
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Host access via child netgroups</h6>
+                    </div>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 table-netgroup-scroll">
+                                <table class="table">
+                                    <tbody>
+                                    {% for parent_netgroup, host_list in parent_hosts %}
+                                        {% for host in host_list %}
+                                        <tr>
+                                            <th>{{ parent_netgroup }}</th>
+                                            <td>
+                                                <a href="{{ path('host_show', {'name': host.name}) }}">{{ host.name }}</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

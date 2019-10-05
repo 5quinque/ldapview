@@ -96,16 +96,27 @@ class PeopleController extends AbstractController
     public function show(People $person): Response
     {
         $netgroups = $person->getNetgroup();
-
+        
         $hosts = [];
+        $parent_netgroup_arr = [];
         foreach ($netgroups as $netgroup) {
             $hosts[$netgroup->getName()] = $netgroup->getHost()->toArray();
+            $parent_netgroup_arr[] = $netgroup->getParentNetgroup();
         }
 
+        $parent_hosts = [];
+        foreach ($parent_netgroup_arr as $parent_netgroups) {
+            foreach ($parent_netgroups as $parent_netgroup) {
+                $parent_hosts[$parent_netgroup->getName()] = $parent_netgroup->getHost()->toArray();
+            }
+        }
+        
         return $this->render('people/show.html.twig', [
             'person' => $person,
             'netgroups' => $netgroups->toArray(),
             'hosts' => $hosts,
+            'parent_netgroup_arr' => $parent_netgroup_arr,
+            'parent_hosts' => $parent_hosts,
         ]);
     }
 

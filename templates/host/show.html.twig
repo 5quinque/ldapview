@@ -56,6 +56,10 @@
                                         <tr>
                                                 <td><a href="{{ path('netgroup_show', {'name': netgroup.name}) }}">{{ netgroup.name }}</a></td>
                                         </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
@@ -75,11 +79,15 @@
                                 <table class="table">
                                     <tbody>
                                     {% for child_netgroups in child_netgroup_arr %}
-                                    {% for child in child_netgroups %}
+                                        {% for child in child_netgroups %}
                                         <tr>
                                             <td><a href="{{ path('netgroup_show', {'name': child.name}) }}">{{ child.name }}</a></td>
                                         </tr>
-                                    {% endfor %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
@@ -110,6 +118,10 @@
                                             </td>
                                         </tr>
                                         {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
@@ -137,6 +149,10 @@
                                             </td>
                                         </tr>
                                         {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td>no records found</td>
+                                        </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
