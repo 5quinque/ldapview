@@ -54,8 +54,7 @@
                                     <tbody>
                                     {% for netgroup in netgroups %}
                                         <tr>
-                                            <th>Netgroup</th>
-                                            <td><a href="{{ path('netgroup_show', {'name': netgroup.name}) }}">{{ netgroup.name }}</a></td>
+                                                <td><a href="{{ path('netgroup_show', {'name': netgroup.name}) }}">{{ netgroup.name }}</a></td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -64,6 +63,31 @@
                         </div>
                     </div>
                 </div>
+                <div class="card shadow mb-4">
+                    <!-- Card Header -->
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Child Netgroups</h6>
+                    </div>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 table-netgroup-scroll">
+                                <table class="table">
+                                    <tbody>
+                                    {% for child_netgroups in child_netgroup_arr %}
+                                    {% for child in child_netgroups %}
+                                        <tr>
+                                            <td><a href="{{ path('netgroup_show', {'name': child.name}) }}">{{ child.name }}</a></td>
+                                        </tr>
+                                    {% endfor %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="col-xl-4 col-lg-4">
                 <div class="card shadow mb-4">
@@ -93,6 +117,34 @@
                         </div>
                     </div>
                 </div>
+                <div class="card shadow mb-4">
+                    <!-- Card Header -->
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">User access via child netgroup</h6>
+                    </div>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 table-netgroup-scroll">
+                                <table class="table">
+                                    <tbody>
+                                    {% for child_netgroup, person_list in child_people %}
+                                        {% for person in person_list %}
+                                        <tr>
+                                            <th>{{ child_netgroup }}</th>
+                                            <td>
+                                                <a href="{{ path('people_show', {'uid': person.uid}) }}">{{ person.uid }}</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

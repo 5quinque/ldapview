@@ -22,8 +22,9 @@ class HostController extends AbstractController
         $page_size = 10;
 
         if (isset($_GET["limit"])) {
-            if (preg_match('/^\d+$/', $_GET["limit"]))
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
                 $page_size = $_GET["limit"];
+            }
         }
 
         $query = $hostRepository->createQueryBuilder('p')->getQuery();
@@ -54,14 +55,26 @@ class HostController extends AbstractController
         $netgroups = $host->getNetgroups();
 
         $people = [];
-        foreach($netgroups as $netgroup) {
+        $child_netgroup_arr = [];
+        foreach ($netgroups as $netgroup) {
             $people[$netgroup->getName()] = $netgroup->getPeople()->toArray();
+            $child_netgroup_arr[] = $netgroup->getChildNetgroup();
+        }
+        
+
+        $child_people = [];
+        foreach ($child_netgroup_arr as $child_netgroups) {
+            foreach ($child_netgroups as $child_netgroup) {
+                $child_people[$child_netgroup->getName()] = $child_netgroup->getPeople()->toArray();
+            }
         }
 
         return $this->render('host/show.html.twig', [
             'host' => $host,
             'netgroups' => $netgroups,
             'people' => $people,
+            'child_netgroup_arr' => $child_netgroup_arr,
+            'child_people' => $child_people,
         ]);
     }
 }
