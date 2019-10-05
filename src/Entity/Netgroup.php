@@ -42,10 +42,22 @@ class Netgroup
      */
     private $people;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Netgroup", inversedBy="parent_netgroup")
+     */
+    private $child_netgroup;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Netgroup", mappedBy="child_netgroup")
+     */
+    private $parent_netgroup;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
         $this->people = new ArrayCollection();
+        $this->child_netgroup = new ArrayCollection();
+        $this->parent_netgroup = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -126,6 +138,60 @@ class Netgroup
         if ($this->people->contains($person)) {
             $this->people->removeElement($person);
             $person->removeNetgroup($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getChildNetgroup(): Collection
+    {
+        return $this->child_netgroup;
+    }
+
+    public function addChildNetgroup(self $childNetgroup): self
+    {
+        if (!$this->child_netgroup->contains($childNetgroup)) {
+            $this->child_netgroup[] = $childNetgroup;
+        }
+
+        return $this;
+    }
+
+    public function removeChildNetgroup(self $childNetgroup): self
+    {
+        if ($this->child_netgroup->contains($childNetgroup)) {
+            $this->child_netgroup->removeElement($childNetgroup);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getParentNetgroup(): Collection
+    {
+        return $this->parent_netgroup;
+    }
+
+    public function addParentNetgroup(self $parentNetgroup): self
+    {
+        if (!$this->parent_netgroup->contains($parentNetgroup)) {
+            $this->parent_netgroup[] = $parentNetgroup;
+            $parentNetgroup->addChildNetgroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParentNetgroup(self $parentNetgroup): self
+    {
+        if ($this->parent_netgroup->contains($parentNetgroup)) {
+            $this->parent_netgroup->removeElement($parentNetgroup);
+            $parentNetgroup->removeChildNetgroup($this);
         }
 
         return $this;

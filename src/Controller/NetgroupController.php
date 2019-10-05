@@ -83,11 +83,13 @@ class NetgroupController extends AbstractController
     {
         $people = $netgroup->getPeople();
         $hosts = $netgroup->getHost();
+        $child_netgroups = $netgroup->getChildNetgroup();
 
         return $this->render('netgroup/show.html.twig', [
             'netgroup' => $netgroup,
             'people' => $people,
             'hosts' => $hosts,
+            'child_netgroups' => $child_netgroups,
         ]);
     }
 

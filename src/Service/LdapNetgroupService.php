@@ -73,6 +73,9 @@ class LdapNetgroupService
         if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
             $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
         }
+        if (isset($ldap_netgroup->getAttributes()["memberNisNetgroup"])) {
+            $this->addChildNetgroups($netgroup, $ldap_netgroup->getAttributes()["memberNisNetgroup"]);
+        }
 
         $this->om->persist($netgroup);
         $this->om->flush();
@@ -128,6 +131,24 @@ class LdapNetgroupService
         }
         
         return $results;
+    }
+
+    private function addChildNetgroups(Netgroup $netgroup, array $netgroups)
+    {
+        // Add these users to netgroup
+        foreach ($netgroups as $nis) {
+            $childNetgroup = $this->netgroupRepository->findOneBy(array('name' => $nis));
+
+            // If user isn't in database, check LDAP and create new entity
+            if (is_null($childNetgroup)) {
+                $ldap_child = $this->findOneByNetgroup($nis);
+                if (is_null($ldap_child)) {
+                    continue;
+                }
+                $childNetgroup = $this->createNetgroupEntity($ldap_child);
+            }
+            $netgroup->addChildNetgroup($childNetgroup);
+        }
     }
 
     private function addUsers(Netgroup $netgroup, array $people)
