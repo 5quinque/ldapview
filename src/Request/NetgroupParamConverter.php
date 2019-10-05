@@ -10,49 +10,27 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\Entity\Netgroup;
 use App\Entity\People;
-use App\Service\LdapService;
+use App\Service\LdapPeopleService;
 
 class NetgroupParamConverter implements ParamConverterInterface
 {
     private $netgroupRepository;
-
+    
     private $peopleRepository;
 
-    /**                                                                              
-     * The parameter name.                                                           
-     *                                                                               
-     * @var string                                                                   
-     */                                                                              
-    private $name;                                                                   
-                                                                                     
-    /**                                                                              
-     * The parameter class.                                                          
-     *                                                                               
-     * @var string                                                                   
-     */                                                                              
-    private $class;                                                                  
-                                                                                     
-    /**                                                                              
-     * An array of options.                                                          
-     *                                                                               
-     * @var array                                                                    
-     */                                                                              
-    private $options = [];                                                           
-   
-
-    public function __construct(NetgroupRepository $netgroupRepository, PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapService $ldapService)
+    public function __construct(NetgroupRepository $netgroupRepository, PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapPeopleService $ldapPeopleService)
     {
         $this->netgroupRepository = $netgroupRepository;
         $this->peopleRepository = $peopleRepository;
         $this->om = $objectManager;
-        $this->ldapService = $ldapService;
+        $this->ldapPeopleService = $ldapPeopleService;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
         $name = $request->attributes->get('name');
         $netgroup = $this->netgroupRepository->findOneBy(array('name' => $name));
-        $ldap_netgroup = $this->ldapService->findOneByNetgroup($name);
+        $ldap_netgroup = $this->ldapPeopleService->findOneByNetgroup($name);
 
         if (is_null($ldap_netgroup)) {
             // [todo] if $netgroup exists, remove entity?
@@ -94,15 +72,14 @@ class NetgroupParamConverter implements ParamConverterInterface
 
             // If user isn't in database, check LDAP and create new entity
             if (is_null($person)) {
-                $ldap_person = $this->ldapService->findOneByUid($matches[1]);
+                $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
                 if (is_null($ldap_person)) {
                     continue;
                 }
-                $person = $this->ldapService->createPersonEntity($ldap_person);                
+                $person = $this->ldapPeopleService->createPersonEntity($ldap_person);                
             }
             $netgroup->addPerson($person);
         }
-
     }
 
     public function supports(ParamConverter $configuration)

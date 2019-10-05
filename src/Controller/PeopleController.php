@@ -11,24 +11,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Request\PeopleParmConverter;
-use App\Service\LdapService;
-
+use App\Service\LdapPeopleService;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/people")
  */
 class PeopleController extends AbstractController
-{  
+{
     /**
      * @Route("/{page_no<\d+>?0}", name="people_index", methods={"GET"})
      */
-    public function index(PeopleRepository $peopleRepository, int $page_no): Response
+    public function index(PeopleRepository $peopleRepository, int $page_no, LdapPeopleService $ldapPeopleService): Response
     {
+        // $ldapPeopleService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
         $page_size = 10;
 
         if (isset($_GET["limit"])) {
-            if (preg_match('/^\d+$/', $_GET["limit"]))
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
                 $page_size = $_GET["limit"];
+            }
         }
 
         $query = $peopleRepository->createQueryBuilder('p')->getQuery();
@@ -75,6 +77,20 @@ class PeopleController extends AbstractController
     }
 
     /**
+     * @Route("/deleteall", name="people_deleteall")
+     */
+    public function deleteAll(EntityManagerInterface $entityManager, PeopleRepository $peopleRepository)
+    {
+        $people = $peopleRepository->findAll();
+        //$people =[];
+        foreach ($people as $person) {
+            //echo ';';
+            $entityManager->remove($person);
+            $entityManager->flush();
+        }
+    }
+
+    /**
      * @Route("/{uid}", name="people_show", methods={"GET"})
      */
     public function show(People $person): Response
@@ -82,7 +98,7 @@ class PeopleController extends AbstractController
         $netgroups = $person->getNetgroup();
 
         $hosts = [];
-        foreach($netgroups as $netgroup) {
+        foreach ($netgroups as $netgroup) {
             $hosts[$netgroup->getName()] = $netgroup->getHost()->toArray();
         }
 
@@ -96,14 +112,14 @@ class PeopleController extends AbstractController
     /**
      * @Route("/{uid}/edit", name="people_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, People $person, LdapService $ldapService): Response
+    public function edit(Request $request, People $person, LdapPeopleService $ldapPeopleService): Response
     {
         $form = $this->createForm(PeopleType::class, $person);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-            $ldapService->persist($person);
+            $ldapPeopleService->persist($person);
 
             return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }

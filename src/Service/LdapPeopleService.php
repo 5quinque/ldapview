@@ -8,20 +8,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use App\Repository\PeopleRepository;
 use App\Entity\People;
 
-class LdapService
+class LdapPeopleService
 {
     private $ldap;
-
-    public function isDirectoryAdmin($uid)
-    {
-        $query = $this->ldap->query('cn=Directory Administrators,dc=example,dc=org',
-            "uniqueMember=uid={$uid},ou=people,dc=example,dc=org"
-        );
-
-        $results = $query->execute();
-
-        return $results->count() === 1;
-    }
 
     public function __construct(ObjectManager $objectManager, PeopleRepository $peopleRepository)
     {
@@ -36,10 +25,23 @@ class LdapService
         $this->peopleRepository = $peopleRepository;
     }
 
+    public function isDirectoryAdmin($uid)
+    {
+        $query = $this->ldap->query(
+            'cn=Directory Administrators,dc=example,dc=org',
+            "uniqueMember=uid={$uid},ou=people,dc=example,dc=org"
+        );
+
+        $results = $query->execute();
+
+        return $results->count() === 1;
+    }
+
     public function persist(People $person)
     {
         $entryManager = $this->ldap->getEntryManager();
-        $query = $this->ldap->query('ou=people,dc=example,dc=org',
+        $query = $this->ldap->query(
+            'ou=people,dc=example,dc=org',
             "(&(ObjectClass=posixAccount)(uid={$person->getUid()}))",
             ["maxItems" => 1]
         );
@@ -67,9 +69,11 @@ class LdapService
             current($ldap_person->getAttributes()["uid"])
         );
         $person->setType("staff");
-        $person->setGecos(
-            current($ldap_person->getAttributes()["gecos"])
-        );
+        if (isset($ldap_person->getAttributes()["gecos"])) {
+            $person->setGecos(
+                current($ldap_person->getAttributes()["gecos"])
+            );
+        }
         $person->setUidNumber(
             current($ldap_person->getAttributes()["uidNumber"])
         );
@@ -88,7 +92,8 @@ class LdapService
 
     public function findOneByUid(string $uid): ?object
     {
-        $query = $this->ldap->query('ou=people,dc=example,dc=org',
+        $query = $this->ldap->query(
+            'ou=people,dc=example,dc=org',
             "(&(ObjectClass=posixAccount)(uid={$uid}))",
             ["maxItems" => 1]
         );
@@ -103,7 +108,8 @@ class LdapService
 
     public function findOneByNetgroup(string $name): ?object
     {
-        $query = $this->ldap->query('ou=netgroup,dc=example,dc=org',
+        $query = $this->ldap->query(
+            'ou=netgroup,dc=example,dc=org',
             "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
             ["maxItems" => 1]
         );
@@ -116,14 +122,35 @@ class LdapService
         return current($results->toArray());
     }
 
-    public function findAll() {
-        $query = $this->ldap->query('ou=people,dc=example,dc=org', 'objectClass=posixAccount',
+    public function findAll(array $criteria = [])
+    {
+        $ou = "";
+        $objectClass = "";
+
+        if (isset($criteria["ou"])) {
+            $ou = "ou={$criteria["ou"]},";
+        }
+        if (isset($criteria["objectClass"])) {
+            $objectClass = "objectClass={$criteria["objectClass"]}";
+        }
+
+        $query = $this->ldap->query(
+            "{$ou}dc=example,dc=org",
+            $objectClass,
             [
                 "pageSize" => 10,
             ]
         );
         $results = $query->execute();
-        dump($results->toArray());
+
+        // foreach ($results as $ldap_person) {
+        //     $person = $this->peopleRepository->findOneBy(array('uid' => $ldap_person->getAttributes()["uid"]));
+        //     if (!$person) {
+        //         $this->createPersonEntity($ldap_person);
+        //     } else {
+        //         $this->updatePersonEntity($person, $ldap_person);
+        // }
+        //dump($results->toArray());
 
         return $results;
     }

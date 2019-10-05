@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Request\NetgroupParmConverter;
+use App\Service\LdapNetgroupService;
 
 /**
  * @Route("/netgroup")
@@ -20,13 +21,16 @@ class NetgroupController extends AbstractController
     /**
      * @Route("/{page_no<\d+>?0}", name="netgroup_index", methods={"GET"})
      */
-    public function index(NetgroupRepository $netgroupRepository, int $page_no): Response
+    public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapNetgroupService $ldapNetgroupService): Response
     {
+        // $ldapNetgroupService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+
         $page_size = 10;
 
         if (isset($_GET["limit"])) {
-            if (preg_match('/^\d+$/', $_GET["limit"]))
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
                 $page_size = $_GET["limit"];
+            }
         }
 
         $query = $netgroupRepository->createQueryBuilder('p')->getQuery();

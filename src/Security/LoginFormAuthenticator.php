@@ -15,7 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
-use App\Service\LdapService;
+use App\Service\LdapPeopleService;
 
 class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
@@ -23,13 +23,13 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     private $urlGenerator;
     private $csrfTokenManager;
-    private $ldapService;
+    private $ldapPeopleService;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, LdapService $ldapService)
+    public function __construct(UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, LdapPeopleService $ldapPeopleService)
     {
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->ldapService = $ldapService;
+        $this->ldapPeopleService = $ldapPeopleService;
     }
 
     public function supports(Request $request)
@@ -72,7 +72,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     public function checkCredentials($credentials, UserInterface $user)
     {
         // Check user is in cn=Directory Administrators
-        $isDirectoryAdmin = $this->ldapService->isDirectoryAdmin($user->getUsername());
+        $isDirectoryAdmin = $this->ldapPeopleService->isDirectoryAdmin($user->getUsername());
         if ($isDirectoryAdmin === false) {
             throw new CustomUserMessageAuthenticationException('Directory Administrator privileges required.');
         }
@@ -80,8 +80,8 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $hash = $user->getPassword();
         $password = $credentials["password"];
 
-        $salt = substr(base64_decode(substr($hash,6)),20);
-        $encrypted_password = '{SSHA}' . base64_encode(sha1( $password.$salt, TRUE ). $salt);
+        $salt = substr(base64_decode(substr($hash, 6)), 20);
+        $encrypted_password = '{SSHA}' . base64_encode(sha1($password.$salt, true). $salt);
         
         return $encrypted_password == $hash;
     }

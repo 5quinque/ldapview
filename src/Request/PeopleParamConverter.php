@@ -2,52 +2,34 @@
 namespace App\Request;
 
 use App\Repository\PeopleRepository;
+use App\Repository\NetgroupRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Persistence\ObjectManager;
+use App\Entity\Netgroup;
 use App\Entity\People;
-use App\Service\LdapService;
+use App\Service\LdapPeopleService;
 
 class PeopleParamConverter implements ParamConverterInterface
 {
     private $peopleRepository;
+    private $netgroupRepository;
 
-    /**                                                                              
-     * The parameter name.                                                           
-     *                                                                               
-     * @var string                                                                   
-     */                                                                              
-    private $name;                                                                   
-                                                                                     
-    /**                                                                              
-     * The parameter class.                                                          
-     *                                                                               
-     * @var string                                                                   
-     */                                                                              
-    private $class;                                                                  
-                                                                                     
-    /**                                                                              
-     * An array of options.                                                          
-     *                                                                               
-     * @var array                                                                    
-     */                                                                              
-    private $options = [];                                                           
-   
-
-    public function __construct(PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapService $ldapService)
+    public function __construct(PeopleRepository $peopleRepository, NetgroupRepository $netgroupRepository, ObjectManager $objectManager, LdapPeopleService $ldapPeopleService)
     {
         $this->peopleRepository = $peopleRepository;
+        $this->netgroupRepository = $netgroupRepository;
         $this->om = $objectManager;
-        $this->ldapService = $ldapService;
+        $this->ldapPeopleService = $ldapPeopleService;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
         $uid = $request->attributes->get('uid');
         $person = $this->peopleRepository->findOneBy(array('uid' => $uid));
-        $ldap_person = $this->ldapService->findOneByUid($uid);
+        $ldap_person = $this->ldapPeopleService->findOneByUid($uid);
 
         if (is_null($ldap_person)) {
             // [todo] if $person exists, remove entity?
@@ -55,16 +37,28 @@ class PeopleParamConverter implements ParamConverterInterface
         }
         
         if (!$person) {
-            $person = $this->ldapService->createPersonEntity($ldap_person);
+            $person = $this->ldapPeopleService->createPersonEntity($ldap_person);
         } else {
-            $this->ldapService->updatePersonEntity($person, $ldap_person);
+            $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
         }
+
+        // Find netgroups for user
+        // $netgroup = $this->findNetgroups("unixadms");
+        // dump($netgroup);
+        // dump($netgroup->getPeople());
 
         $param = $configuration->getName();
         
         $request->attributes->set($param, $person);
 
         return true;
+    }
+
+    public function findNetgroups(string $name)
+    {
+        $netgroup = $this->netgroupRepository->findOneBy(array('name' => $name));
+
+        return $netgroup;
     }
 
     public function supports(ParamConverter $configuration)
