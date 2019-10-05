@@ -9,7 +9,6 @@ use App\Repository\NetgroupRepository;
 use App\Repository\PeopleRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-
 class DefaultController extends AbstractController
 {
     /**

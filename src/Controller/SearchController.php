@@ -20,7 +20,7 @@ class SearchController extends AbstractController
         $results = [];
 
         $people = $this->getDoctrine()->getRepository(People::class)->findByLike($query);
-        foreach($people as $person) {
+        foreach ($people as $person) {
             $results[] = array(
                 "name" => $person->getUID(),
                 "href" => $this->generateURL("people_show", ["uid" => $person->getUID()]),
@@ -28,7 +28,7 @@ class SearchController extends AbstractController
             );
         }
         $netgroups = $this->getDoctrine()->getRepository(Netgroup::class)->findByLike($query);
-        foreach($netgroups as $netgroup) {
+        foreach ($netgroups as $netgroup) {
             $results[] = array(
                 "name" => $netgroup->getName(),
                 "href" => $this->generateURL("netgroup_show", ["name" => $netgroup->getName()]),
@@ -36,7 +36,7 @@ class SearchController extends AbstractController
             );
         }
         $hosts = $this->getDoctrine()->getRepository(Host::class)->findByLike($query);
-        foreach($hosts as $host) {
+        foreach ($hosts as $host) {
             $results[] = array(
                 "name" => $host->getName(),
                 "href" => $this->generateURL("host_show", ["name" => $host->getName()]),
