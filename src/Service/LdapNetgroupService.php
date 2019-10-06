@@ -37,7 +37,7 @@ class LdapNetgroupService
     {
         $entryManager = $this->ldap->getEntryManager();
         $query = $this->ldap->query(
-            'ou=netgroup,dc=example,dc=org',
+            "ou=netgroup,{$_ENV['LDAP_DC']}",
             "(&(ObjectClass=nisNetgroup)(uid={$netgroup->getName()}))",
             ["maxItems" => 1]
         );
@@ -86,7 +86,7 @@ class LdapNetgroupService
     public function findOneByNetgroup(string $name): ?object
     {
         $query = $this->ldap->query(
-            'ou=netgroup,dc=example,dc=org',
+            "ou=netgroup,{$_ENV['LDAP_DC']}",
             "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
             ["maxItems" => 1]
         );
@@ -112,7 +112,7 @@ class LdapNetgroupService
         }
 
         $query = $this->ldap->query(
-            "{$ou}dc=example,dc=org",
+            "{$ou}{$_ENV['LDAP_DC']}",
             $objectClass,
             [
                 "pageSize" => 10,

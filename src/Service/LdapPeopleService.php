@@ -28,8 +28,8 @@ class LdapPeopleService
     public function isDirectoryAdmin($uid)
     {
         $query = $this->ldap->query(
-            'cn=Directory Administrators,dc=example,dc=org',
-            "uniqueMember=uid={$uid},ou=people,dc=example,dc=org"
+            "cn=Directory Administrators,{$_ENV['LDAP_DC']}",
+            "uniqueMember=uid={$uid},ou=people,{$_ENV['LDAP_DC']}"
         );
 
         $results = $query->execute();
@@ -41,7 +41,7 @@ class LdapPeopleService
     {
         $entryManager = $this->ldap->getEntryManager();
         $query = $this->ldap->query(
-            'ou=people,dc=example,dc=org',
+            "ou=people,{$_ENV['LDAP_DC']}",
             "(&(ObjectClass=posixAccount)(uid={$person->getUid()}))",
             ["maxItems" => 1]
         );
@@ -93,24 +93,8 @@ class LdapPeopleService
     public function findOneByUid(string $uid): ?object
     {
         $query = $this->ldap->query(
-            'ou=people,dc=example,dc=org',
+            "ou=people,{$_ENV['LDAP_DC']}",
             "(&(ObjectClass=posixAccount)(uid={$uid}))",
-            ["maxItems" => 1]
-        );
-
-        $results = $query->execute();
-        if ($results->count() === 0) {
-            return null;
-        }
-
-        return current($results->toArray());
-    }
-
-    public function findOneByNetgroup(string $name): ?object
-    {
-        $query = $this->ldap->query(
-            'ou=netgroup,dc=example,dc=org',
-            "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
             ["maxItems" => 1]
         );
 
@@ -135,7 +119,7 @@ class LdapPeopleService
         }
 
         $query = $this->ldap->query(
-            "{$ou}dc=example,dc=org",
+            "{$ou}{$_ENV['LDAP_DC']}",
             $objectClass,
             [
                 "pageSize" => 10,

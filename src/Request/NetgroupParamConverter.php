@@ -11,6 +11,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use App\Entity\Netgroup;
 use App\Entity\People;
 use App\Service\LdapPeopleService;
+use App\Service\LdapNetgroupService;
 
 class NetgroupParamConverter implements ParamConverterInterface
 {
@@ -18,19 +19,25 @@ class NetgroupParamConverter implements ParamConverterInterface
     
     private $peopleRepository;
 
-    public function __construct(NetgroupRepository $netgroupRepository, PeopleRepository $peopleRepository, ObjectManager $objectManager, LdapPeopleService $ldapPeopleService)
-    {
+    public function __construct(
+        NetgroupRepository $netgroupRepository,
+        PeopleRepository $peopleRepository,
+        ObjectManager $objectManager,
+        LdapPeopleService $ldapPeopleService,
+        LdapNetgroupService $ldapNetgroupService
+    ) {
         $this->netgroupRepository = $netgroupRepository;
         $this->peopleRepository = $peopleRepository;
         $this->om = $objectManager;
         $this->ldapPeopleService = $ldapPeopleService;
+        $this->ldapNetgroupService = $ldapNetgroupService;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
     {
         $name = $request->attributes->get('name');
         $netgroup = $this->netgroupRepository->findOneBy(array('name' => $name));
-        $ldap_netgroup = $this->ldapPeopleService->findOneByNetgroup($name);
+        $ldap_netgroup = $this->ldapNetgroupService->findOneByNetgroup($name);
 
         if (is_null($ldap_netgroup)) {
             // [todo] if $netgroup exists, remove entity?
@@ -41,7 +48,9 @@ class NetgroupParamConverter implements ParamConverterInterface
             $netgroup = new Netgroup();
         }
 
-        $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
+        if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
+            $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
+        }
         
         if (isset($ldap_netgroup->getAttributes()["description"])) {
             $netgroup->setDescription(
@@ -76,7 +85,7 @@ class NetgroupParamConverter implements ParamConverterInterface
                 if (is_null($ldap_person)) {
                     continue;
                 }
-                $person = $this->ldapPeopleService->createPersonEntity($ldap_person);                
+                $person = $this->ldapPeopleService->createPersonEntity($ldap_person);
             }
             $netgroup->addPerson($person);
         }
