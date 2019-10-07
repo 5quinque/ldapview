@@ -49,7 +49,7 @@ class NetgroupParamConverter implements ParamConverterInterface
         }
 
         if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
-            $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
+            $this->ldapNetgroupService->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
         }
         
         if (isset($ldap_netgroup->getAttributes()["description"])) {
@@ -66,29 +66,6 @@ class NetgroupParamConverter implements ParamConverterInterface
         $request->attributes->set($param, $netgroup);
 
         return true;
-    }
-
-    private function addUsers(Netgroup $netgroup, array $people)
-    {
-        // Add these users to netgroup
-        foreach ($people as $nis) {
-            preg_match('/^\(,(.+),.+\)$/', $nis, $matches);
-            if (empty($matches)) {
-                continue;
-            }
-            
-            $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
-
-            // If user isn't in database, check LDAP and create new entity
-            if (is_null($person)) {
-                $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
-                if (is_null($ldap_person)) {
-                    continue;
-                }
-                $person = $this->ldapPeopleService->createPersonEntity($ldap_person);
-            }
-            $netgroup->addPerson($person);
-        }
     }
 
     public function supports(ParamConverter $configuration)

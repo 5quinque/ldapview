@@ -151,7 +151,7 @@ class LdapNetgroupService
         }
     }
 
-    private function addUsers(Netgroup $netgroup, array $people)
+    public function addUsers(Netgroup $netgroup, array $people)
     {
         // Add these users to netgroup
         foreach ($people as $nis) {
