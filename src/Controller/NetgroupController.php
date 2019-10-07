@@ -102,13 +102,14 @@ class NetgroupController extends AbstractController
     /**
      * @Route("/{name}/edit", name="netgroup_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Netgroup $netgroup): Response
+    public function edit(Request $request, Netgroup $netgroup, LdapNetgroupService $ldapNetgroupService): Response
     {
         $form = $this->createForm(NetgroupType::class, $netgroup);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
+            $ldapNetgroupService->persist($person);
 
             return $this->redirectToRoute('netgroup_show', ['name' => $netgroup->getName()]);
         }

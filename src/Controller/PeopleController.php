@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Request\PeopleParmConverter;
 use App\Service\LdapPeopleService;
+use App\Service\LdapNetgroupService;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -24,7 +25,9 @@ class PeopleController extends AbstractController
      */
     public function index(PeopleRepository $peopleRepository, int $page_no, LdapPeopleService $ldapPeopleService): Response
     {
+        // set_time_limit(0);
         // $ldapPeopleService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
+
         $page_size = 10;
 
         if (isset($_GET["limit"])) {
@@ -123,7 +126,10 @@ class PeopleController extends AbstractController
     /**
      * @Route("/{uid}/edit", name="people_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, People $person, LdapPeopleService $ldapPeopleService): Response
+    public function edit(Request $request,
+        People $person,
+        LdapPeopleService $ldapPeopleService,
+        LdapNetgroupService $ldapNetgroupService): Response
     {
         $form = $this->createForm(PeopleType::class, $person);
         $form->handleRequest($request);
@@ -131,6 +137,7 @@ class PeopleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
             $ldapPeopleService->persist($person);
+            $ldapNetgroupService->persistNetgroups($person);
 
             return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }

@@ -9,6 +9,7 @@ use App\Service\LdapPeopleService;
 use App\Repository\NetgroupRepository;
 use App\Repository\PeopleRepository;
 use App\Entity\Netgroup;
+use App\Entity\People;
 
 class LdapNetgroupService
 {
@@ -38,7 +39,7 @@ class LdapNetgroupService
         $entryManager = $this->ldap->getEntryManager();
         $query = $this->ldap->query(
             "ou=netgroup,{$_ENV['LDAP_DC']}",
-            "(&(ObjectClass=nisNetgroup)(uid={$netgroup->getName()}))",
+            "(&(ObjectClass=nisNetgroup)(cn={$netgroup->getName()}))",
             ["maxItems" => 1]
         );
 
@@ -49,6 +50,33 @@ class LdapNetgroupService
         // todo add/remove people
 
         $entryManager->update($entry);
+    }
+
+    public function persistNetgroups(People $person)
+    {
+        $entryManager = $this->ldap->getEntryManager();
+        $uid = $person->getUid();
+
+        foreach ($person->getNetgroup() as $netgroup) {
+            $name = $netgroup->getName();
+            $query = $this->ldap->query(
+                "ou=netgroup,{$_ENV['LDAP_DC']}",
+                "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
+                ["maxItems" => 1]
+            );
+    
+            $results = $query->execute();
+            $entry = $results[0];
+            $NG_UIDs = $entry->getAttribute('nisNetgroupTriple');
+            if (!count(preg_grep("/^\(,{$uid},.+\)$/", $NG_UIDs))) {
+                $NG_UIDs[] = "(,{$uid},bskyb.com)";
+                $entry->setAttribute('nisNetgroupTriple', $NG_UIDs);
+            }
+
+            // [todo] How to remove user from netgroup?
+
+            $entryManager->update($entry);
+        }
     }
 
     public function createNetgroupEntity(object $ldap_netgroup): object
@@ -143,6 +171,7 @@ class LdapNetgroupService
             if (is_null($childNetgroup)) {
                 $ldap_child = $this->findOneByNetgroup($nis);
                 if (is_null($ldap_child)) {
+                    // User can not be found in LDAP
                     continue;
                 }
                 $childNetgroup = $this->createNetgroupEntity($ldap_child);
