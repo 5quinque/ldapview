@@ -1,4 +1,6 @@
 {% set page_no = app.request.get('page_no') %}
+{% set route = app.request.get('_route') %}
+{% dump route %}
 {% if page_no == 0 %}
     {% set previous_page_no = 0 %}
 {% else %}
@@ -10,11 +12,21 @@
     {% set next_page_no = page_no + 1 %}
 {% endif %}
 {% set nearbyPagesLimit = 4 %}
+{% if  netgroups is defined %}
+{% set items = netgroups %}
+{% set item_count = netgroup_count %}
+{% elseif hosts is defined %}
+{% set items = hosts %}
+{% set item_count = host_count %}
+{% elseif people is defined %}
+{% set items = people %}
+{% set item_count = people_count %}
+{% endif %}
 <div class="row">
     <div class="col-sm-12 col-md-5">
         <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
             Showing {{ page_no * 10 }}
-            to {{ (page_no * 10) + netgroups|length }} of {{ netgroup_count }} entries
+            to {{ (page_no * 10) + items|length }} of {{ item_count }} entries
         </div>
     </div>
     <div class="col-sm-12 col-md-7">
@@ -22,13 +34,13 @@
             <ul class="pagination justify-content-end">
                 <li class="paginate_button page-item previous {% if page_no == 0 %}disabled{% endif %}"
                     id="dataTable_previous"><a
-                            href="{{ path('netgroup_index', {'page_no': previous_page_no}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
+                            href="{{ path(route, {'page_no': previous_page_no}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
                             aria-controls="dataTable" data-dt-idx="0" tabindex="0"
                             class="page-link">Previous</a></li>
                 {% for i in range(0, page_count) %}
                     {% if (loop.index == 1) or (loop.index == page_count) %} {# Always show page 1 & last page#}
                         <li class="paginate_button page-item {% if page_no == i %}active{% endif %}"><a
-                                    href="{{ path('netgroup_index', {'page_no': i}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
+                                    href="{{ path(route, {'page_no': i}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
                                     aria-controls="dataTable"
                                     data-dt-idx="{{ i }}" tabindex="0"
                                     class="page-link">{{ i }}</a></li>
@@ -40,14 +52,14 @@
                     {% elseif 0 > (page_no + nearbyPagesLimit) - loop.index %} {# hide all after #}
                     {% else %}
                         <li class="paginate_button page-item {% if page_no == i %}active{% endif %}"><a
-                                    href="{{ path('netgroup_index', {'page_no': i}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
+                                    href="{{ path(route, {'page_no': i}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
                                     aria-controls="dataTable"
                                     data-dt-idx="{{ i }}" tabindex="0"
                                     class="page-link">{{ i }}</a></li>
                     {% endif %}                {% endfor %}
                 <li class="paginate_button page-item next {% if page_no == page_count %}disabled{% endif %}"
                     id="dataTable_next"><a
-                            href="{{ path('netgroup_index', {'page_no': page_no+1}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
+                            href="{{ path(route, {'page_no': page_no+1}) }}{{ limit != 10 ? "?limit=#{limit}" }}"
                             aria-controls="dataTable"
                             data-dt-idx="{{ page_count }}"
                             tabindex="0"
