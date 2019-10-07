@@ -127,13 +127,14 @@ class LdapPeopleService
         );
         $results = $query->execute();
 
-        // foreach ($results as $ldap_person) {
-        //     $person = $this->peopleRepository->findOneBy(array('uid' => $ldap_person->getAttributes()["uid"]));
-        //     if (!$person) {
-        //         $this->createPersonEntity($ldap_person);
-        //     } else {
-        //         $this->updatePersonEntity($person, $ldap_person);
-        // }
+        foreach ($results as $ldap_person) {
+            $person = $this->peopleRepository->findOneBy(array('uid' => $ldap_person->getAttributes()["uid"]));
+            if (!$person) {
+                $this->createPersonEntity($ldap_person);
+            } else {
+                $this->updatePersonEntity($person, $ldap_person);
+            }
+        }
         //dump($results->toArray());
 
         return $results;
