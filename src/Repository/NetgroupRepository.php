@@ -28,32 +28,35 @@ class NetgroupRepository extends ServiceEntityRepository
            ->getResult();
     }
 
-    // /**
-    //  * @return Netgroup[] Returns an array of Netgroup objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getList(int $page_no)
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $page_size = 10;
 
-    /*
-    public function findOneBySomeField($value): ?Netgroup
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (isset($_GET["limit"])) {
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
+                $page_size = $_GET["limit"];
+            }
+        }
+
+        $query = $this->createQueryBuilder('p')->getQuery();
+        
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $netgroup_count = $paginator->count();
+        $page_count = (int)floor($netgroup_count / $page_size);
+        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
+
+        $netgroups = [];
+        foreach ($paginator as $netgroup) {
+            $netgroups[] = $netgroup;
+        }
+
+        return [
+            "netgroups" => $netgroups,
+            "page_count" => $page_count,
+            "netgroup_count" => $netgroup_count,
+            "page_size" => $page_size
+        ];
     }
-    */
+
 }

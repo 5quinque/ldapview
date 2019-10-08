@@ -24,33 +24,15 @@ class NetgroupController extends AbstractController
      */
     public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapService $ldapService): Response
     {
-        $ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+        //$ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
 
-        $page_size = 10;
-
-        if (isset($_GET["limit"])) {
-            if (preg_match('/^\d+$/', $_GET["limit"])) {
-                $page_size = $_GET["limit"];
-            }
-        }
-
-        $query = $netgroupRepository->createQueryBuilder('p')->getQuery();
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-
-        $netgroup_count = $paginator->count();
-        $page_count = (int)floor($netgroup_count / $page_size);
-        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
-
-        $netgroups = [];
-        foreach ($paginator as $netgroup) {
-            $netgroups[] = $netgroup;
-        }
-
+        $list = $netgroupRepository->getList($page_no);
+        
         return $this->render('netgroup/index.html.twig', [
-            'netgroups' => $netgroups,
-            'page_count' => $page_count,
-            'netgroup_count' => $netgroup_count,
-            'limit' => $page_size,
+            'netgroups' => $list["netgroups"],
+            'page_count' => $list["page_count"],
+            'netgroup_count' => $list["netgroup_count"],
+            'limit' => $list["page_size"],
         ]);
     }
 
