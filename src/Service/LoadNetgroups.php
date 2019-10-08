@@ -78,9 +78,17 @@ class LoadNetgroups
 
         return $netgroup;
     }
+    
+    public function createNetgroupsIfNotExists(array $netgroups, Host $host)
+    {
+        foreach($netgroups as $netgroup) {
+            $this->createNetgroupIfNotExists($netgroup, $host);
+        }
+    }
 
     public function readAll()
     {
+        // [todo] get this from .env
         $directory = "/home/ryan/dev/ldapview/accessfiles";
 
         $files = scandir($directory);
@@ -88,6 +96,7 @@ class LoadNetgroups
         $hosts = [];
         $netgroups = [];
 
+        // [todo] check for /etc/passwd
         foreach ($files as $f) {
             if (in_array($f, array('.', '..'))
                 || !is_dir("$directory/$f")
@@ -96,12 +105,9 @@ class LoadNetgroups
 
             $hosts[] = $f;
             $host = $this->createHostIfNotExists($f);
-
             $netgroups = $this->getNetgroups("$directory/$f/etc/security/access.conf");
 
-            foreach($netgroups as $netgroup) {
-                $this->createNetgroupIfNotExists($netgroup, $host);
-            }
+            $this->createNetgroupsIfNotExists($netgroups, $host);
         }
         return $hosts;
     }
