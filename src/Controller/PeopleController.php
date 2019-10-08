@@ -24,12 +24,10 @@ class PeopleController extends AbstractController
     /**
      * @Route("/{page_no<\d+>?0}", name="people_index", methods={"GET"})
      */
-    public function index(PeopleRepository $peopleRepository, int $page_no, LdapPeopleService $ldapPeopleService): Response
+    public function index(PeopleRepository $peopleRepository, int $page_no, LdapService $ldapService): Response
     {
         // set_time_limit(0);
-        // $ldapServer = new LdapService();
-        // $ldapServer->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
-
+        // $ldapService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
 
         $page_size = 10;
 

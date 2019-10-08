@@ -89,6 +89,10 @@ class LdapNetgroupService
 
     public function updateNetgroupEntity(Netgroup $netgroup, object $ldap_netgroup): object
     {
+        if (!$netgroup) {
+            $netgroup = new Netgroup();
+        }
+        dump($netgroup->getName());
         $netgroup->setName(
             current($ldap_netgroup->getAttributes()["cn"])
         );

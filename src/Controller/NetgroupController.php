@@ -22,10 +22,9 @@ class NetgroupController extends AbstractController
     /**
      * @Route("/{page_no<\d+>?0}", name="netgroup_index", methods={"GET"})
      */
-    public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapNetgroupService $ldapNetgroupService): Response
+    public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapService $ldapService): Response
     {
-        // $ldapServer = new LdapService();
-        // $ldapServer->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+        $ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
 
         $page_size = 10;
 

@@ -66,6 +66,10 @@ class LdapPeopleService
 
     public function updatePersonEntity(People $person, object $ldap_person): object
     {
+        if (!$person) {
+            $person = new People();
+        }
+
         $person->setUid(
             current($ldap_person->getAttributes()["uid"])
         );
