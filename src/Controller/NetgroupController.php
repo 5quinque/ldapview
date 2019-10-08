@@ -23,10 +23,11 @@ class NetgroupController extends AbstractController
      */
     public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapService $ldapService): Response
     {
-        //$ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+        // set_time_limit(0);
+        // $ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
 
         $list = $netgroupRepository->getList($page_no);
-        
+
         return $this->render('netgroup/index.html.twig', [
             'netgroups' => $list["netgroups"],
             'page_count' => $list["page_count"],
@@ -68,7 +69,7 @@ class NetgroupController extends AbstractController
         $child_netgroups = $netgroup->getChildNetgroup();
 
         $child_people = [];
-        foreach($child_netgroups as $child_netgroup) {
+        foreach ($child_netgroups as $child_netgroup) {
             $child_people[$child_netgroup->getName()] = $child_netgroup->getPeople()->toArray();
         }
 
@@ -91,7 +92,7 @@ class NetgroupController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-            $ldapNetgroupService->persist($person);
+            $ldapNetgroupService->persist($netgroup);
 
             return $this->redirectToRoute('netgroup_show', ['name' => $netgroup->getName()]);
         }

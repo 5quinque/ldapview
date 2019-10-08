@@ -65,7 +65,7 @@ class LdapNetgroupService
                 "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
                 ["maxItems" => 1]
             );
-    
+
             $results = $query->execute();
             $entry = $results[0];
             $NG_UIDs = $entry->getAttribute('nisNetgroupTriple');
@@ -102,7 +102,7 @@ class LdapNetgroupService
                 current($ldap_netgroup->getAttributes()["description"])
             );
         }
-        
+
         if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
             $this->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
         }
@@ -112,7 +112,7 @@ class LdapNetgroupService
 
         $this->om->persist($netgroup);
         $this->om->flush();
-        
+
         return $netgroup;
     }
 
@@ -159,17 +159,18 @@ class LdapNetgroupService
             if (empty($matches)) {
                 continue;
             }
-            
-            $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
 
-            // If user isn't in database, check LDAP and create new entity
-            if (is_null($person)) {
-                $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
-                if (is_null($ldap_person)) {
-                    continue;
-                }
-                $person = $this->ldapPeopleService->createPersonEntity($ldap_person);
+            // Get the person entity
+            $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
+            $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
+           
+            // If user isn't in database, or LDAP, move on
+            if (is_null($person) && is_null($ldap_person)) {
+                continue;
             }
+
+            $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
+            $person = $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
             $netgroup->addPerson($person);
         }
     }
