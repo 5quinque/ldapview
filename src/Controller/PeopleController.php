@@ -29,31 +29,13 @@ class PeopleController extends AbstractController
         // set_time_limit(0);
         // $ldapService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
 
-        $page_size = 10;
-
-        if (isset($_GET["limit"])) {
-            if (preg_match('/^\d+$/', $_GET["limit"])) {
-                $page_size = $_GET["limit"];
-            }
-        }
-
-        $query = $peopleRepository->createQueryBuilder('p')->getQuery();
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-
-        $people_count = $paginator->count();
-        $page_count = (int)floor($people_count / $page_size);
-        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
-
-        $people = [];
-        foreach ($paginator as $person) {
-            $people[] = $person;
-        }
+        $list = $peopleRepository->getList($page_no);
 
         return $this->render('people/index.html.twig', [
-            'people' => $people,
-            'page_count' => $page_count,
-            'people_count' => $people_count,
-            'limit' => $page_size,
+            'people' => $list["people"],
+            'page_count' => $list["page_count"],
+            'people_count' => $list["people_count"],
+            'limit' => $list["page_size"],
         ]);
     }
 

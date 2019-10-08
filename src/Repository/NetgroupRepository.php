@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Netgroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method Netgroup|null find($id, $lockMode = null, $lockVersion = null)

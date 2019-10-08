@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\People;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method People|null find($id, $lockMode = null, $lockVersion = null)
@@ -28,32 +29,33 @@ class PeopleRepository extends ServiceEntityRepository
            ->getResult();
     }
 
-    // /**
-    //  * @return People[] Returns an array of People objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getList(int $page_no)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $page_size = 10;
 
-    /*
-    public function findOneBySomeField($value): ?People
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (isset($_GET["limit"])) {
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
+                $page_size = $_GET["limit"];
+            }
+        }
+
+        $query = $this->createQueryBuilder('p')->getQuery();
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $people_count = $paginator->count();
+        $page_count = (int)floor($people_count / $page_size);
+        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
+
+        $people = [];
+        foreach ($paginator as $person) {
+            $people[] = $person;
+        }
+        
+        return [
+            "people" => $people,
+            "page_count" => $page_count,
+            "people_count" => $people_count,
+            "page_size" => $page_size
+        ];
     }
-    */
 }

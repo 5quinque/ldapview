@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Host;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method Host|null find($id, $lockMode = null, $lockVersion = null)
@@ -28,32 +29,34 @@ class HostRepository extends ServiceEntityRepository
            ->getResult();
     }
 
-    // /**
-    //  * @return Host[] Returns an array of Host objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getList(int $page_no)
     {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $page_size = 10;
 
-    /*
-    public function findOneBySomeField($value): ?Host
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (isset($_GET["limit"])) {
+            if (preg_match('/^\d+$/', $_GET["limit"])) {
+                $page_size = $_GET["limit"];
+            }
+        }
+
+        $query = $this->createQueryBuilder('p')->getQuery();
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $host_count = $paginator->count();
+        $page_count = (int) floor($host_count / $page_size);
+        $paginator->getQuery()->setFirstResult($page_size * $page_no)->setMaxResults($page_size)->getArrayResult();
+
+        $hosts = [];
+        foreach ($paginator as $host) {
+            $hosts[] = $host;
+        }
+
+        return [
+            "hosts" => $hosts,
+            "page_count" => $page_count,
+            "host_count" => $host_count,
+            "page_size" => $page_size
+        ];
     }
-    */
+
 }

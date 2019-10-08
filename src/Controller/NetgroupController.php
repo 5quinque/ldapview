@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Entity\Netgroup;
 use App\Form\NetgroupType;
 use App\Repository\NetgroupRepository;
