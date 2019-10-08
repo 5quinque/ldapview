@@ -127,11 +127,11 @@ class LdapNetgroupService
         return current($results->toArray());
     }
 
-    public function findAll(array $criteria = [])
+    private function setCriteria(array $criteria = [])
     {
         $ou = "";
         $objectClass = "";
-
+        
         if (isset($criteria["ou"])) {
             $ou = "ou={$criteria["ou"]},";
         }
@@ -139,9 +139,16 @@ class LdapNetgroupService
             $objectClass = "objectClass={$criteria["objectClass"]}";
         }
 
+        return ["ou" => $ou, "objectClass" => $objectClass];
+    }
+
+    public function findAll(array $criteria = [])
+    {
+        $criteria = $this->setCriteria($criteria);
+
         $query = $this->ldap->query(
-            "{$ou}{$_ENV['LDAP_DC']}",
-            $objectClass,
+            "{$criteria['ou']}{$_ENV['LDAP_DC']}",
+            $criteria["objectClass"],
             [
                 "pageSize" => 10,
             ]
