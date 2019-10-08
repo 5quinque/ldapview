@@ -128,32 +128,6 @@ class LdapNetgroupService
         return current($results->toArray());
     }
 
-    public function findAll(array $criteria = [])
-    {
-        $criteria = LdapService::setCriteria($criteria);
-
-        $query = $this->ldap->query(
-            "{$criteria['ou']}{$_ENV['LDAP_DC']}",
-            $criteria["objectClass"],
-            [
-                "pageSize" => 10,
-            ]
-        );
-        $results = $query->execute();
-
-        foreach ($results as $ldap_netgroup) {
-            $netgroup = $this->netgroupRepository->findOneBy(array('name' => $ldap_netgroup->getAttributes()["cn"]));
-
-            if (!$netgroup) {
-                $this->createNetgroupEntity($ldap_netgroup);
-            } else {
-                $this->updateNetgroupEntity($netgroup, $ldap_netgroup);
-            }
-        }
-        
-        return $results;
-    }
-
     private function addChildNetgroups(Netgroup $netgroup, array $netgroups)
     {
         // Add these users to netgroup

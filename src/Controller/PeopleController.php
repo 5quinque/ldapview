@@ -14,6 +14,7 @@ use App\Request\PeopleParmConverter;
 use App\Service\LdapPeopleService;
 use App\Service\LdapNetgroupService;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\LdapService;
 
 /**
  * @Route("/people")
@@ -26,7 +27,9 @@ class PeopleController extends AbstractController
     public function index(PeopleRepository $peopleRepository, int $page_no, LdapPeopleService $ldapPeopleService): Response
     {
         // set_time_limit(0);
-        // $ldapPeopleService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
+        // $ldapServer = new LdapService();
+        // $ldapServer->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
+
 
         $page_size = 10;
 

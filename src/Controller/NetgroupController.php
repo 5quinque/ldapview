@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Request\NetgroupParmConverter;
 use App\Service\LdapNetgroupService;
+use App\Service\LdapService;
 
 /**
  * @Route("/netgroup")
@@ -23,7 +24,8 @@ class NetgroupController extends AbstractController
      */
     public function index(NetgroupRepository $netgroupRepository, int $page_no, LdapNetgroupService $ldapNetgroupService): Response
     {
-        // $ldapNetgroupService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+        // $ldapServer = new LdapService();
+        // $ldapServer->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
 
         $page_size = 10;
 
