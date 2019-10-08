@@ -5,6 +5,7 @@ namespace App\Service;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Entry;
 use Doctrine\Common\Persistence\ObjectManager;
+use App\Service\LdapService;
 use App\Service\LdapPeopleService;
 use App\Repository\NetgroupRepository;
 use App\Repository\PeopleRepository;
@@ -127,24 +128,9 @@ class LdapNetgroupService
         return current($results->toArray());
     }
 
-    private function setCriteria(array $criteria = [])
-    {
-        $ou = "";
-        $objectClass = "";
-        
-        if (isset($criteria["ou"])) {
-            $ou = "ou={$criteria["ou"]},";
-        }
-        if (isset($criteria["objectClass"])) {
-            $objectClass = "objectClass={$criteria["objectClass"]}";
-        }
-
-        return ["ou" => $ou, "objectClass" => $objectClass];
-    }
-
     public function findAll(array $criteria = [])
     {
-        $criteria = $this->setCriteria($criteria);
+        $criteria = LdapService::setCriteria($criteria);
 
         $query = $this->ldap->query(
             "{$criteria['ou']}{$_ENV['LDAP_DC']}",

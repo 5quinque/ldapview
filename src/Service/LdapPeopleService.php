@@ -5,6 +5,7 @@ namespace App\Service;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Entry;
 use Doctrine\Common\Persistence\ObjectManager;
+use App\Service\LdapService;
 use App\Repository\PeopleRepository;
 use App\Entity\People;
 
@@ -108,19 +109,11 @@ class LdapPeopleService
 
     public function findAll(array $criteria = [])
     {
-        $ou = "";
-        $objectClass = "";
-
-        if (isset($criteria["ou"])) {
-            $ou = "ou={$criteria["ou"]},";
-        }
-        if (isset($criteria["objectClass"])) {
-            $objectClass = "objectClass={$criteria["objectClass"]}";
-        }
+        $criteria = LdapService::setCriteria($criteria);
 
         $query = $this->ldap->query(
-            "{$ou}{$_ENV['LDAP_DC']}",
-            $objectClass,
+            "{$criteria['ou']}{$_ENV['LDAP_DC']}",
+            $criteria["objectClass"],
             [
                 "pageSize" => 10,
             ]
