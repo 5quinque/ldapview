@@ -1,6 +1,5 @@
 {% set page_no = app.request.get('page_no') %}
 {% set route = app.request.get('_route') %}
-{% dump route %}
 {% if page_no == 0 %}
     {% set previous_page_no = 0 %}
 {% else %}

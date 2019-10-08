@@ -169,7 +169,6 @@ class LdapNetgroupService
                 continue;
             }
 
-            $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
             $person = $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
             $netgroup->addPerson($person);
         }
