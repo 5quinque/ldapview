@@ -31,9 +31,9 @@ class PeopleController extends AbstractController
         $list = $peopleRepository->getList($page_no);
 
         return $this->render('people/index.html.twig', [
-            'people' => $list["people"],
+            'people' => $list["items"],
             'page_count' => $list["page_count"],
-            'people_count' => $list["people_count"],
+            'people_count' => $list["item_count"],
             'limit' => $list["page_size"],
         ]);
     }

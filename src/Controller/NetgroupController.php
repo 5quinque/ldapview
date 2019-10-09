@@ -29,9 +29,9 @@ class NetgroupController extends AbstractController
         $list = $netgroupRepository->getList($page_no);
 
         return $this->render('netgroup/index.html.twig', [
-            'netgroups' => $list["netgroups"],
+            'netgroups' => $list["items"],
             'page_count' => $list["page_count"],
-            'netgroup_count' => $list["netgroup_count"],
+            'netgroup_count' => $list["item_count"],
             'limit' => $list["page_size"],
         ]);
     }

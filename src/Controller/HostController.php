@@ -21,9 +21,9 @@ class HostController extends AbstractController
         $list = $hostRepository->getList($page_no);
 
         return $this->render('host/index.html.twig', [
-            'hosts' => $list["hosts"],
+            'hosts' => $list["items"],
             'page_count' => $list["page_count"],
-            'host_count' => $list["host_count"],
+            'host_count' => $list["item_count"],
             'limit' => $list["page_size"],
         ]);
     }
