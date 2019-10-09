@@ -513,5 +513,8 @@
     },
     "zendframework/zend-code": {
         "version": "3.3.2"
+    },
+    "zendframework/zend-eventmanager": {
+        "version": "3.3-dev"
     }
 }
