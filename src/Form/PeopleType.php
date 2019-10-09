@@ -15,7 +15,7 @@ class PeopleType extends AbstractType
     {
         $builder
             ->add('type')
-            ->add('uid')
+            ->add('uid', null, ['disabled' => true])
             ->add('gecos')
             ->add('uidNumber')
             ->add('gidNumber')

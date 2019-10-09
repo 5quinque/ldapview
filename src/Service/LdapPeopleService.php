@@ -57,13 +57,6 @@ class LdapPeopleService
         $entryManager->update($entry);
     }
 
-    public function createPersonEntity(object $ldap_person): object
-    {
-        $person = new People();
-
-        return $this->updatePersonEntity($person, $ldap_person);
-    }
-
     public function updatePersonEntity(People $person, object $ldap_person): object
     {
         if (!$person) {

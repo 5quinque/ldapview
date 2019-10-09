@@ -36,11 +36,8 @@ class PeopleParamConverter implements ParamConverterInterface
             throw new NotFoundHttpException("User not found in LDAP");
         }
 
-        if (!$person) {
-            $person = $this->ldapPeopleService->createPersonEntity($ldap_person);
-        } else {
-            $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
-        }
+
+        $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
 
         // Find netgroups for user
         // $netgroup = $this->findNetgroups("unixadms");

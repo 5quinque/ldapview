@@ -88,7 +88,8 @@ class People
 
     public function setUid(string $uid): self
     {
-        $this->uid = $uid;
+        // Using `strtolower` to always ensure uid is lowercase
+        $this->uid = strtolower($uid);
 
         return $this;
     }
