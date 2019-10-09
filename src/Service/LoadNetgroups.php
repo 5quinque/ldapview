@@ -78,18 +78,17 @@ class LoadNetgroups
 
         return $netgroup;
     }
-    
+
     public function createNetgroupsIfNotExists(array $netgroups, Host $host)
     {
-        foreach($netgroups as $netgroup) {
+        foreach ($netgroups as $netgroup) {
             $this->createNetgroupIfNotExists($netgroup, $host);
         }
     }
 
     public function readAll()
     {
-        // [todo] get this from .env
-        $directory = "/home/ryan/dev/ldapview/accessfiles";
+        $directory = $_ENV['ACCESS_DIR'];
 
         $files = scandir($directory);
 
@@ -97,19 +96,33 @@ class LoadNetgroups
         $netgroups = [];
 
         // [todo] check for /etc/passwd
-        foreach ($files as $f) {
-            if (in_array($f, array('.', '..'))
-                || !is_dir("$directory/$f")
-                || !is_file("$directory/$f/etc/security/access.conf"))
+        foreach ($files as $hostname) {
+            if (
+                in_array($hostname, array('.', '..'))
+                || !is_dir("$directory/$hostname")
+            )
                 continue;
 
-            $hosts[] = $f;
-            $host = $this->createHostIfNotExists($f);
-            $netgroups = $this->getNetgroups("$directory/$f/etc/security/access.conf");
+            $accessFile = $this->getAccessFile("$directory/$hostname");
+
+            $hosts[] = $hostname;
+            $host = $this->createHostIfNotExists($hostname);
+            $netgroups = $this->getNetgroups($accessFile);
 
             $this->createNetgroupsIfNotExists($netgroups, $host);
         }
         return $hosts;
+    }
+
+    private function getAccessFile($hostDirectory)
+    {
+        if (is_file("$hostDirectory/etc/security/access.conf")) {
+            return "$hostDirectory/etc/security/access.conf";
+        }
+        if (is_file("$hostDirectory/etc/passwd")) {
+            return "$hostDirectory/etc/passwd";
+        }
+        return null;
     }
 
     public function getNetgroups($accessFile)
@@ -129,11 +142,18 @@ class LoadNetgroups
 
     public function parseNetgroup($accessline)
     {
+        // RegEx for access.conf (RedHat)
         preg_match('/^\+ : @(.+) : ALL$/', $accessline, $matches);
         if (!empty($matches)) {
             return $matches[1];
         }
+        // RegEx for passwd (Solaris)
+        // Possibly change (.+?) for ([\w-]+)
+        preg_match('/^\+@(.+?):.+$/', $accessline, $matches);
+        if (!empty($matches)) {
+            return $matches[1];
+        }
+
         return false;
     }
-
 }
