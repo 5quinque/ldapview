@@ -12,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Request\PeopleParmConverter;
 use App\Service\LdapPeopleService;
 use App\Service\LdapNetgroupService;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Service\LdapService;
 
 /**
@@ -62,20 +61,6 @@ class PeopleController extends AbstractController
     }
 
     /**
-     * @Route("/deleteall", name="people_deleteall")
-     */
-    public function deleteAll(EntityManagerInterface $entityManager, PeopleRepository $peopleRepository)
-    {
-        $people = $peopleRepository->findAll();
-        //$people =[];
-        foreach ($people as $person) {
-            //echo ';';
-            $entityManager->remove($person);
-            $entityManager->flush();
-        }
-    }
-
-    /**
      * @Route("/{uid}", name="people_show", methods={"GET"})
      */
     public function show(People $person): Response
@@ -117,9 +102,11 @@ class PeopleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $previousNetgroups = unserialize($form->get('netgroups_hidden')->getData());
+            
             $this->getDoctrine()->getManager()->flush();
             $ldapPeopleService->persist($person);
-            $ldapNetgroupService->persistNetgroups($person);
+            $ldapNetgroupService->persistNetgroups($person, $previousNetgroups);
 
             return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }

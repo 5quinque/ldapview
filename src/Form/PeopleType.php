@@ -8,14 +8,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Form\EventListener\AddUidFieldSubscriber;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class PeopleType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('type')
-            ->add('uid', null, ['disabled' => true])
+            ->add('type', HiddenType::class)
+            ->add('uid')
+            ->addEventSubscriber(new AddUidFieldSubscriber())
             ->add('gecos')
             ->add('uidNumber')
             ->add('gidNumber')
@@ -27,10 +30,11 @@ class PeopleType extends AbstractType
                 },
                 'multiple' => true,
                 'required' => false,
-                'attr' => array('class'=>'selectpicker',
-                    'data-live-search' => 'true', 'data-actions-box' => 'true'),
-            ])
-        ;
+                'attr' => array(
+                    'class' => 'selectpicker',
+                    'data-live-search' => 'true', 'data-actions-box' => 'true'
+                ),
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

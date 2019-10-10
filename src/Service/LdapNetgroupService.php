@@ -53,7 +53,7 @@ class LdapNetgroupService
         $entryManager->update($entry);
     }
 
-    public function persistNetgroups(People $person)
+    public function persistNetgroups(People $person, array $previousNetgroups)
     {
         $entryManager = $this->ldap->getEntryManager();
         $uid = $person->getUid();
@@ -74,10 +74,10 @@ class LdapNetgroupService
                 $entry->setAttribute('nisNetgroupTriple', $NG_UIDs);
             }
 
-            // [todo] How to remove user from netgroup?
-
             $entryManager->update($entry);
         }
+        // [todo] How to remove user from netgroup?
+        // use $previousNetgroups and compare with $person->getNetgroup
     }
 
     public function createNetgroupEntity(object $ldap_netgroup): object
