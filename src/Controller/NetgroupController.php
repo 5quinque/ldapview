@@ -91,8 +91,10 @@ class NetgroupController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $previousPeople = unserialize($form->get('people_hidden')->getData());
             $this->getDoctrine()->getManager()->flush();
-            $ldapNetgroupService->persist($netgroup);
+            
+            $ldapNetgroupService->persist($netgroup, $previousPeople);
 
             return $this->redirectToRoute('netgroup_show', ['name' => $netgroup->getName()]);
         }

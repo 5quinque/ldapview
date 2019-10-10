@@ -35,7 +35,7 @@ class LdapNetgroupService
         $this->ldapPeopleService = $ldapPeopleService;
     }
 
-    public function persist(Netgroup $netgroup)
+    public function persist(Netgroup $netgroup, array $previousPeople)
     {
         $entryManager = $this->ldap->getEntryManager();
         $query = $this->ldap->query(
@@ -53,7 +53,7 @@ class LdapNetgroupService
         $entryManager->update($entry);
     }
 
-    public function persistNetgroups(People $person, array $previousNetgroups)
+    public function persistPerson(People $person, array $previousNetgroups)
     {
         $entryManager = $this->ldap->getEntryManager();
         $uid = $person->getUid();

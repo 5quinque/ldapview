@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use App\Form\EventListener\AddPeopleFieldSubscriber;
 
 class NetgroupType extends AbstractType
 {
@@ -24,10 +24,12 @@ class NetgroupType extends AbstractType
                 'by_reference' => false,
                 'multiple' => true,
                 'required' => false,
-                'attr' => array('class'=>'selectpicker',
-                    'data-live-search' => 'true', 'data-actions-box' => 'true'),
+                'attr' => array(
+                    'class' => 'selectpicker',
+                    'data-live-search' => 'true', 'data-actions-box' => 'true'
+                ),
             ])
-        ;
+            ->addEventSubscriber(new AddPeopleFieldSubscriber());
     }
 
     public function configureOptions(OptionsResolver $resolver)

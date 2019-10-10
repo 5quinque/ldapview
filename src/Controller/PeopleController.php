@@ -106,7 +106,7 @@ class PeopleController extends AbstractController
             
             $this->getDoctrine()->getManager()->flush();
             $ldapPeopleService->persist($person);
-            $ldapNetgroupService->persistNetgroups($person, $previousNetgroups);
+            $ldapNetgroupService->persistPerson($person, $previousNetgroups);
 
             return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
         }
