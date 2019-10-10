@@ -58,6 +58,7 @@ class LdapNetgroupService
         $entryManager = $this->ldap->getEntryManager();
         $uid = $person->getUid();
 
+        // Add user to netgroups
         foreach ($person->getNetgroup() as $netgroup) {
             $name = $netgroup->getName();
             $query = $this->ldap->query(
@@ -69,6 +70,8 @@ class LdapNetgroupService
             $results = $query->execute();
             $entry = $results[0];
             $NG_UIDs = $entry->getAttribute('nisNetgroupTriple');
+
+            // If user not already in netgroup, add it
             if (!count(preg_grep("/^\(,{$uid},.+\)$/", $NG_UIDs))) {
                 $NG_UIDs[] = "(,{$uid},bskyb.com)";
                 $entry->setAttribute('nisNetgroupTriple', $NG_UIDs);
@@ -76,8 +79,44 @@ class LdapNetgroupService
 
             $entryManager->update($entry);
         }
-        // [todo] How to remove user from netgroup?
-        // use $previousNetgroups and compare with $person->getNetgroup
+
+        $this->removeUserFromNetgroups($uid, $person->getNetgroup(), $previousNetgroups);
+    }
+
+    public function removeUserFromNetgroups(string $uid, object $currentNetgroups, array $previousNetgroups)
+    {
+        // Convert `$currentNetgroups` into just an array of ids
+        $currentNetgroupsIds = [];
+        foreach ($currentNetgroups as $netgroup) {
+            $currentNetgroupsIds[] = $netgroup->getId();
+        }
+
+        // Remove user from any netgroups they have been removed from
+        $netgroupsToRemove = array_diff($previousNetgroups, $currentNetgroupsIds);
+        foreach ($netgroupsToRemove as $netgroupID) {
+            $netgroup = $this->netgroupRepository->findOneBy(["id" => $netgroupID]);
+            $this->removeUserFromNetgroup($uid, $netgroup->getName());
+        }
+    }
+
+    public function removeUserFromNetgroup($uid, $netgroup)
+    {
+        $entryManager = $this->ldap->getEntryManager();
+        $query = $this->ldap->query(
+            "ou=netgroup,{$_ENV['LDAP_DC']}",
+            "(&(structuralObjectClass=nisNetgroup)(cn={$netgroup}))",
+            ["maxItems" => 1]
+        );
+        $results = $query->execute();
+        $entry = $results[0];
+        
+        $peopleInNetgroup = $entry->getAttribute('nisNetgroupTriple');
+        $peopleWithoutUid = array_diff($peopleInNetgroup, ["(,{$uid},bskyb.com)"]);
+        $entry->setAttribute('nisNetgroupTriple', $peopleWithoutUid);
+        $entryManager->update($entry);
+
+        // Figure out how to get this to work..?
+        //$entryManager->removeAttributeValues($entry, 'nisNetgroupTriple', ["(,{$uid},bskyb.com)"]);
     }
 
     public function createNetgroupEntity(object $ldap_netgroup): object
