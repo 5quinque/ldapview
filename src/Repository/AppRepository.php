@@ -2,11 +2,12 @@
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+#use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 abstract class AppRepository extends ServiceEntityRepository {
-    public function __construct(RegistryInterface $registry, $entityClass) {
+    public function __construct(ManagerRegistry $registry, $entityClass) {
         parent::__construct($registry, $entityClass);
     }
 

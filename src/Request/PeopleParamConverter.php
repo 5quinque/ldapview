@@ -39,7 +39,7 @@ class PeopleParamConverter implements ParamConverterInterface
 
         $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
 
-        // Find netgroups for user
+        // Find netgroups for user [todo]
         // $netgroup = $this->findNetgroups("unixadms");
         // dump($netgroup);
         // dump($netgroup->getPeople());
