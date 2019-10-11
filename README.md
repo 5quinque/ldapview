@@ -4,7 +4,7 @@ LdapView
 Requirements
 ------------
    * PHP 7.3+
-   * PHP Extensions mysqlnd, json
+   * PHP Extensions mysqlnd, json, ldap
    * Mariadb-server 5.5+
    * and the [usual Symfony application requirements][1].
 
