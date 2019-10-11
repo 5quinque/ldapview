@@ -144,12 +144,12 @@ class LdapNetgroupService
         return $this->updateNetgroupEntity($netgroup, $ldap_netgroup);
     }
 
-    public function updateNetgroupEntity(Netgroup $netgroup, object $ldap_netgroup): object
+    public function updateNetgroupEntity($netgroup, object $ldap_netgroup): object
     {
         if (!$netgroup) {
             $netgroup = new Netgroup();
         }
-        dump($netgroup->getName());
+        
         $netgroup->setName(
             current($ldap_netgroup->getAttributes()["cn"])
         );
@@ -221,12 +221,14 @@ class LdapNetgroupService
             $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
             $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
            
-            // If user isn't in database, or LDAP, move on
-            if (is_null($person) && is_null($ldap_person)) {
+            // If user isn't in LDAP, move on
+            if (is_null($ldap_person) || is_null($person)) {
                 continue;
             }
 
-            $person = $this->ldapPeopleService->updatePersonEntity($person, $ldap_person);
+            // Only add the user if they already exist in our database
+            // We won't search for the user in LDAP and add it
+
             $netgroup->addPerson($person);
         }
     }

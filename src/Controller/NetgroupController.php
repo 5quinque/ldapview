@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Request\NetgroupParmConverter;
 use App\Service\LdapNetgroupService;
 use App\Service\LdapService;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/netgroup")
@@ -34,6 +35,19 @@ class NetgroupController extends AbstractController
             'netgroup_count' => $list["item_count"],
             'limit' => $list["page_size"],
         ]);
+    }
+
+    /**
+     * @Route("/deleteall", name="netgroup_deleteall")
+     */
+    public function deleteAll(EntityManagerInterface $entityManager, NetgroupRepository $netgroupRepository)
+    {
+        $netgroups = $netgroupRepository->findAll();
+        foreach ($netgroups as $netgroup) {
+            $entityManager->remove($netgroup);
+        }
+        $entityManager->flush();
+        return $this->redirectToRoute('netgroup_index');
     }
 
     /**

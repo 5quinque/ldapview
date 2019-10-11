@@ -31,21 +31,6 @@ class LdapService
         $this->peopleRepository = $peopleRepository;
     }
 
-    public function setCriteria(array $criteria = [])
-    {
-        $ou = "";
-        $objectClass = "";
-        
-        if (isset($criteria["ou"])) {
-            $ou = "ou={$criteria["ou"]},";
-        }
-        if (isset($criteria["objectClass"])) {
-            $objectClass = "objectClass={$criteria["objectClass"]}";
-        }
-
-        return ["ou" => $ou, "objectClass" => $objectClass];
-    }
-
     public function findAll(array $criteria = [])
     {
         $criteria = $this->setCriteria($criteria);
@@ -64,6 +49,21 @@ class LdapService
         }
         
         return $results;
+    }
+
+    public function setCriteria(array $criteria = [])
+    {
+        $ou = "";
+        $objectClass = "";
+        
+        if (isset($criteria["ou"])) {
+            $ou = "ou={$criteria["ou"]},";
+        }
+        if (isset($criteria["objectClass"])) {
+            $objectClass = "objectClass={$criteria["objectClass"]}";
+        }
+
+        return ["ou" => $ou, "objectClass" => $objectClass];
     }
 
     public function persistEntity(string $type, object $ldap_result)

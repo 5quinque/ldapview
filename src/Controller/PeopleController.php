@@ -13,6 +13,7 @@ use App\Request\PeopleParmConverter;
 use App\Service\LdapPeopleService;
 use App\Service\LdapNetgroupService;
 use App\Service\LdapService;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/people")
@@ -35,6 +36,21 @@ class PeopleController extends AbstractController
             'people_count' => $list["item_count"],
             'limit' => $list["page_size"],
         ]);
+    }
+
+    /**
+     * @Route("/deleteall", name="people_deleteall")
+     */
+    public function deleteAll(EntityManagerInterface $entityManager, PeopleRepository $peopleRepository)
+    {
+        $people = $peopleRepository->findAll();
+        //$people =[];
+        foreach ($people as $person) {
+            //echo ';';
+            $entityManager->remove($person);
+        }
+        $entityManager->flush();
+        return $this->redirectToRoute('people_index');
     }
 
     /**
