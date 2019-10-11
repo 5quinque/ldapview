@@ -48,7 +48,9 @@ class LdapNetgroupService
 
         $entry = $results[0];
         $entry->setAttribute('description', [$netgroup->getDescription()]);
-        // todo add/remove people
+
+        // todo test add/remove people
+        $this->removeNetgroupFromUsers($netgroup->getName(), $netgroup->getPeople(), $previousPeople);
 
         $entryManager->update($entry);
     }
@@ -81,6 +83,22 @@ class LdapNetgroupService
         }
 
         $this->removeUserFromNetgroups($uid, $person->getNetgroup(), $previousNetgroups);
+    }
+
+    public function removeNetgroupFromUsers(string $name, object $currentPeople, array $previousPeople)
+    {
+        // Convert `$currentNetgroups` into just an array of ids
+        $currentPeopleIds = [];
+        foreach ($currentPeople as $person) {
+            $currentPeopleIds[] = $person->getId();
+        }
+
+        // Remove any users from netgroup
+        $peopleToRemove = array_diff($previousPeople, $currentPeopleIds);
+        foreach ($peopleToRemove as $personID) {
+            $person = $this->peopleRepository->findOneBy(["id" => $personID]);
+            $this->removeUserFromNetgroup($person->getId(), $name);
+        }
     }
 
     public function removeUserFromNetgroups(string $uid, object $currentNetgroups, array $previousNetgroups)
