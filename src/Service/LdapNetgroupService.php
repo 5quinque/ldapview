@@ -127,7 +127,7 @@ class LdapNetgroupService
         );
         $results = $query->execute();
         $entry = $results[0];
-        
+
         $peopleInNetgroup = $entry->getAttribute('nisNetgroupTriple');
         $peopleWithoutUid = array_diff($peopleInNetgroup, ["(,{$uid},bskyb.com)"]);
         $entry->setAttribute('nisNetgroupTriple', $peopleWithoutUid);
@@ -149,7 +149,7 @@ class LdapNetgroupService
         if (!$netgroup) {
             $netgroup = new Netgroup();
         }
-        
+
         $netgroup->setName(
             current($ldap_netgroup->getAttributes()["cn"])
         );
@@ -193,19 +193,25 @@ class LdapNetgroupService
     {
         // Add these users to netgroup
         foreach ($netgroups as $nis) {
-            $childNetgroup = $this->netgroupRepository->findOneBy(array('name' => $nis));
-
-            // If user isn't in database, check LDAP and create new entity
-            if (is_null($childNetgroup)) {
-                $ldap_child = $this->findOneByNetgroup($nis);
-                if (is_null($ldap_child)) {
-                    // User can not be found in LDAP
-                    continue;
-                }
-                $childNetgroup = $this->createNetgroupEntity($ldap_child);
-            }
-            $netgroup->addChildNetgroup($childNetgroup);
+            $this->addChildNetgroup($netgroup, $nis);
         }
+    }
+
+    private function addChildNetgroup(Netgroup $parentNetgroup, $childNetgroupName)
+    {
+        $childNetgroup = $this->netgroupRepository->findOneBy(array('name' => $childNetgroupName));
+
+        // If netgroup isn't in database, check LDAP and create new entity
+        if (is_null($childNetgroup)) {
+            $ldap_child = $this->findOneByNetgroup($childNetgroupName);
+            if (is_null($ldap_child)) {
+                // User can not be found in LDAP
+                continue;
+            }
+            $childNetgroup = $this->createNetgroupEntity($ldap_child);
+        }
+
+        $parentNetgroup->addChildNetgroup($childNetgroup);
     }
 
     public function addUsers(Netgroup $netgroup, array $people)
@@ -220,7 +226,7 @@ class LdapNetgroupService
             // Get the person entity
             $person = $this->peopleRepository->findOneBy(array('uid' => $matches[1]));
             $ldap_person = $this->ldapPeopleService->findOneByUid($matches[1]);
-           
+
             // If user isn't in LDAP, move on
             if (is_null($ldap_person) || is_null($person)) {
                 continue;
