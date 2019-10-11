@@ -206,7 +206,7 @@ class LdapNetgroupService
             $ldap_child = $this->findOneByNetgroup($childNetgroupName);
             if (is_null($ldap_child)) {
                 // User can not be found in LDAP
-                continue;
+                return false;
             }
             $childNetgroup = $this->createNetgroupEntity($ldap_child);
         }
