@@ -3,17 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\People;
-use App\Form\PeopleType;
 use App\Repository\PeopleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Request\PeopleParmConverter;
-use App\Service\LdapPeopleService;
-use App\Service\LdapNetgroupService;
 use App\Service\LdapService;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/people")
@@ -25,9 +20,6 @@ class PeopleController extends AbstractController
      */
     public function index(PeopleRepository $peopleRepository, int $page_no, LdapService $ldapService): Response
     {
-        // set_time_limit(0);
-        // $ldapService->findAll(["ou" => "people", "objectClass" => "posixAccount"]);
-
         $list = $peopleRepository->getList($page_no);
 
         return $this->render('people/index.html.twig', [
@@ -35,44 +27,6 @@ class PeopleController extends AbstractController
             'page_count' => $list["page_count"],
             'people_count' => $list["item_count"],
             'limit' => $list["page_size"],
-        ]);
-    }
-
-    /**
-     * @Route("/deleteall", name="people_deleteall")
-     */
-    public function deleteAll(EntityManagerInterface $entityManager, PeopleRepository $peopleRepository)
-    {
-        $people = $peopleRepository->findAll();
-        //$people =[];
-        foreach ($people as $person) {
-            //echo ';';
-            $entityManager->remove($person);
-        }
-        $entityManager->flush();
-        return $this->redirectToRoute('people_index');
-    }
-
-    /**
-     * @Route("/new", name="people_new", methods={"GET","POST"})
-     */
-    public function new(Request $request): Response
-    {
-        $person = new People();
-        $form = $this->createForm(PeopleType::class, $person);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($person);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
-        }
-
-        return $this->render('people/new.html.twig', [
-            'person' => $person,
-            'form' => $form->createView(),
         ]);
     }
 
@@ -106,44 +60,4 @@ class PeopleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{uid}/edit", name="people_edit", methods={"GET","POST"})
-     */
-    public function edit(Request $request,
-        People $person,
-        LdapPeopleService $ldapPeopleService,
-        LdapNetgroupService $ldapNetgroupService): Response
-    {
-        $form = $this->createForm(PeopleType::class, $person);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $previousNetgroups = unserialize($form->get('netgroups_hidden')->getData());
-            
-            $this->getDoctrine()->getManager()->flush();
-            $ldapPeopleService->persist($person);
-            $ldapNetgroupService->persistPerson($person, $previousNetgroups);
-
-            return $this->redirectToRoute('people_show', ['uid' => $person->getUid()]);
-        }
-
-        return $this->render('people/edit.html.twig', [
-            'person' => $person,
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/{uid}", name="people_delete", methods={"DELETE"})
-     */
-    public function delete(Request $request, People $person): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $person->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($person);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('people_index');
-    }
 }
