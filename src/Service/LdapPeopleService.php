@@ -38,25 +38,6 @@ class LdapPeopleService
         return $results->count() === 1;
     }
 
-    public function persist(People $person)
-    {
-        $entryManager = $this->ldap->getEntryManager();
-        $query = $this->ldap->query(
-            "ou=people,{$_ENV['LDAP_DC']}",
-            "(&(ObjectClass=posixAccount)(uid={$person->getUid()}))",
-            ["maxItems" => 1]
-        );
-
-        $results = $query->execute();
-
-        $entry = $results[0];
-        $entry->setAttribute('gecos', [$person->getGecos()]);
-        $entry->setAttribute('gidNumber', [$person->getGidNumber()]);
-        $entry->setAttribute('uidNumber', [$person->getUidNUmber()]);
-        $entry->setAttribute('homeDirectory', [$person->getHomeDirectory()]);
-        $entryManager->update($entry);
-    }
-
     public function updatePersonEntity($person, object $ldap_person): object
     {
         if (!$person) {
@@ -75,9 +56,12 @@ class LdapPeopleService
         $person->setUidNumber(
             current($ldap_person->getAttributes()["uidNumber"])
         );
-        $person->setGidNumber(
-            current($ldap_person->getAttributes()["gidNumber"])
-        );
+
+        $gid = $this->getLdapGid($ldap_person->getAttributes()["gidNumber"]);
+        if ($gid) {
+            $person->setGidNumber($gid);
+        }
+
         $person->setHomeDirectory(
             current($ldap_person->getAttributes()["homeDirectory"])
         );
@@ -86,6 +70,23 @@ class LdapPeopleService
         $this->om->flush();
         
         return $person;
+    }
+
+    public function getLdapGid($gid)
+    {
+        if (is_numeric($gid)) {
+            return $gid;
+        }
+        
+        if (!is_array($gid)) {
+            return false;
+        }
+
+        if (is_numeric($gid[0])) {
+            return $gid[0];
+        }
+
+        return false;
     }
 
     public function findOneByUid(string $uid): ?object

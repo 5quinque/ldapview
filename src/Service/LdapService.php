@@ -37,10 +37,7 @@ class LdapService
 
         $query = $this->ldap->query(
             "{$criteria['ou']}{$_ENV['LDAP_DC']}",
-            $criteria["objectClass"],
-            [
-                "pageSize" => 10,
-            ]
+            $criteria["objectClass"]
         );
         $results = $query->execute();
 

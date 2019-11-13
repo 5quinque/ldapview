@@ -3,16 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}LDAPView 2{% endblock %}</title>
+    <title>{% block title %}LDAPView{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
           integrity="sha256-46qynGAkLSFpVbEBog43gvNhfrOj+BmwXdxFgVK/Kvc=" crossorigin="anonymous"/>
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
     {% block stylesheets %}{% endblock %}
-    <link href="{{ asset('/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
-    <link rel="icon" href="{{ asset('/favicon.png') }}">
+    {# <link rel="icon" href="{{ asset('favicon.png') }}"> #}
 </head>
 <body id="page-top">
 <div id="wrapper">
@@ -28,20 +28,20 @@
 </div>
 
 <!-- Bootstrap core JavaScript-->
-<script src="{{ asset('/vendor/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- Core plugin JavaScript-->
-<script src="{{ asset('/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+<script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 <!-- Custom scripts for all pages-->
-<script src="{{ asset('/js/sb-admin-2.js') }}"></script>
+<script src="{{ asset('js/sb-admin-2.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
 
-<script src="{{ asset('/js/bootstrap3-typeahead.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap3-typeahead.min.js') }}"></script>
 <script>
     let $search = $('#search');
     $search.typeahead({
         source: function (query, process) {
-            $.getJSON(`/search/${query}`)
+            $.getJSON(`${window.location.href.replace(/\/$/, '')}/search/${query}`)
                 .done(function (response) {
                     return process(response);
                 });

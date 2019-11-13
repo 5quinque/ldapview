@@ -33,7 +33,7 @@ class loadNetgroupsCommand extends Command
         $output->writeln('Loading Netgroups');
         $output->writeln('=================');
 
-        $something = $this->ng_service->test();
+        $something = $this->ng_service->loadAll();
         $output->writeln($something);
     }
 }

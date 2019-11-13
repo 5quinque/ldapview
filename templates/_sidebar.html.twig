@@ -5,10 +5,10 @@
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('homepage') }}">
         <div class="sidebar-brand-icon rotate-n-15">
-        <img src="{{ asset('/favicon.png') }}" class="img-fluid"> 
+        {# <img src="{{ asset('/favicon.png') }}" class="img-fluid">  #}
             {# <i class="fas fa-hat-cowboy-side"></i> #}
         </div>
-        <div class="sidebar-brand-text mx-3">LdapView<sup>2</sup></div>
+        <div class="sidebar-brand-text mx-3">LdapView</div>
     </a>
 
     <!-- Divider -->
@@ -43,7 +43,6 @@
                 <h6 class="collapse-header">Actions:</h6>
                 <a class="collapse-item {{ route == 'people_index' ? 'active' }}"
                    href="{{ path('people_index') }}">List</a>
-                <a class="collapse-item {{ route == 'people_new' ? 'active' }}" href="{{ path('people_new') }}">New</a>
             </div>
         </div>
     </li>
@@ -61,8 +60,6 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Actions:</h6>
                 <a class="collapse-item {{ route == 'netgroup_index' ? 'active' }}" href="{{ path('netgroup_index') }}">List</a>
-                <a class="collapse-item {{ route == 'netgroup_new' ? 'active' }}"
-                   href="{{ path('netgroup_new') }}">New</a>
             </div>
         </div>
     </li>

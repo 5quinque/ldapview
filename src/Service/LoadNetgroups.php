@@ -21,7 +21,7 @@ class LoadNetgroups
         $this->hostRepository = $hostRepository;
     }
 
-    public function test()
+    public function loadAll()
     {
         $messages = [];
 
@@ -95,7 +95,6 @@ class LoadNetgroups
         $hosts = [];
         $netgroups = [];
 
-        // [todo] check for /etc/passwd
         foreach ($files as $hostname) {
             if (
                 in_array($hostname, array('.', '..'))

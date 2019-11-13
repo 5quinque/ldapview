@@ -33,23 +33,25 @@ class NetgroupParamConverter implements ParamConverterInterface
 
         if (is_null($ldap_netgroup)) {
             // [todo] if $netgroup exists, remove entity?
-            throw new NotFoundHttpException("Netgroup not found in LDAP");
+            //throw new NotFoundHttpException("Netgroup not found in LDAP");
+        } else {
+	    if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
+                $this->ldapNetgroupService->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
+            }
+        
+            if (isset($ldap_netgroup->getAttributes()["description"])) {
+                $netgroup->setDescription(
+                    current($ldap_netgroup->getAttributes()["description"])
+                );
         }
+        
+	}
         
         if (!$netgroup) {
             $netgroup = new Netgroup();
         }
 
-        if (isset($ldap_netgroup->getAttributes()["nisNetgroupTriple"])) {
-            $this->ldapNetgroupService->addUsers($netgroup, $ldap_netgroup->getAttributes()["nisNetgroupTriple"]);
-        }
-        
-        if (isset($ldap_netgroup->getAttributes()["description"])) {
-            $netgroup->setDescription(
-                current($ldap_netgroup->getAttributes()["description"])
-            );
-        }
-        
+       
         $this->om->persist($netgroup);
         $this->om->flush();
 

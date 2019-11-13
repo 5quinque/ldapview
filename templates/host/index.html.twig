@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Netgroup{% endblock %}
+{% block title %}Hosts{% endblock %}
 {% block body %}
     <!-- Begin Page Content -->
     <div class="container-fluid">
@@ -43,9 +43,7 @@
                                     <td>{{ host.name }}</td>
                                     <td class="text-right">
                                         <a class="d-none d-sm-inline-block btn btn-sm btn-info btn-icon-split shadow-sm"
-                                           href="{{ path('host_show', {'name': host.name}) }}"><span
-                                                    class="icon text-white-50"><i
-                                                        class="fas fa-expand-arrows-alt"></i></span><span class="text">Show</span></a>
+                                           href="{{ path('host_show', {'name': host.name}) }}"><span class="text">Show</span></a>
                                     </td>
                                 </tr>
                             {% else %}
