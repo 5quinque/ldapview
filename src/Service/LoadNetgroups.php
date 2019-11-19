@@ -45,13 +45,16 @@ class LoadNetgroups
         $debug = ["Hostname: $hostname\n"];
 
         $host = $this->hostRepository->findOneBy(array('name' => $hostname));
+
         if (empty($host)) {
             $debug[] = "Creating new host entity\n";
             $host = new Host();
             $host->setName($hostname);
             $this->om->persist($host);
-            $this->om->flush();
+        } else {
+            $host->clearNetgroups();
         }
+        $this->om->flush();
 
         $this->printDebug($debug);
 
@@ -106,8 +109,8 @@ class LoadNetgroups
 
             $hosts[] = $hostname;
             $host = $this->createHostIfNotExists($hostname);
-            $netgroups = $this->getNetgroups($accessFile);
 
+            $netgroups = $this->getNetgroups($accessFile);
             $this->createNetgroupsIfNotExists($netgroups, $host);
         }
         return $hosts;

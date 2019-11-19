@@ -4,16 +4,14 @@ LdapView
 Installation
 ------------
 
-Create mysql user (ldapview), grant `ALL PRIVILEGES` to database `ldapview`
+Create mysql user and grant privileges
 
 ```mysql
 CREATE USER 'ldapview'@'localhost' IDENTIFIED BY 'somerandompassword';
 GRANT ALL PRIVILEGES ON ldapview.* TO 'ldapview'@'localhost';
 ```
 
-[Install Composer](https://getcomposer.org/download/)
-
-Clone repository and install dependencies
+Clone repository and install dependencies [[0](#footnote-0)]
 
 ```bash
 git clone git@oegit.bskyb.com:RLI14/ldapview.git
@@ -37,23 +35,16 @@ php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 ```
 
-Run the ansible playbook to retrieve all access files and place them in ldapview/accessfiles (or modify .env.local `ACCESS_DIR` variable)
-Then run the following command to load everything into the database
-
-```bash
-php bin/console app:load-netgroups
-```
-
-Done.
+Everything should now be installed. To load data into the database, read below.
 
 Load netgroups/host into datbase
 --------------------------------
 
-### Ansible Playbook
+### Ansible
 
-Use the [getnetgroups playbook](https://oegit.bskyb.com/RLI14/getnetgroups) and transfer all accessfiles to `./ldapview/accessfiles` or whatever is set in `ACCESS_DIR`.
+Use the [getnetgroups playbook](https://oegit.bskyb.com/RLI14/getnetgroups) and transfer all accessfiles to `./ldapview/accessfiles` (or modify .env.local `ACCESS_DIR` variable to wherever the access files are stored)
 
-Run the follow command
+Run the following command
 
 ```bash
 php bin/console app:load-netgroups
@@ -83,6 +74,7 @@ php bin/console app:load-entity -pgs
 This could be put into cron to run every 30 minutes (Replace the directory with the installation location)
 
 ```
+# Possible need to replace php with /opt/rh/rh-php72/root/usr/bin/php if installing via SCL
 */30 * * * *    php /var/www/html/ldapview/bin/console app:load-entity -pgs
 ```
 
@@ -140,3 +132,8 @@ AllowOverride All
 Notes
 -----
 All PHP commands require PHP version 7. There are instructions above for installing PHP 7 using SCL. Installing via this route would mean the PHP cli is located at `/opt/rh/rh-php72/root/usr/bin/php`
+
+I have added `PATH=/opt/rh/rh-php72/root/usr/bin:$PATH:$HOME/.local/bin:$HOME/bin` to `~/.bash_profile` so I don't have to provide the full path every time.
+
+###### footnote-0
+[Install Composer](https://getcomposer.org/download/)

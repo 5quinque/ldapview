@@ -5,8 +5,10 @@ namespace App\Service;
 use Symfony\Component\Ldap\Ldap;
 use App\Service\LdapPeopleService;
 use App\Service\LdapNetgroupService;
+use App\Service\LdapSudoService;
 use App\Repository\NetgroupRepository;
 use App\Repository\PeopleRepository;
+use App\Repository\SudoRepository;
 
 class LdapService
 {
@@ -14,8 +16,10 @@ class LdapService
 
     public function __construct(LdapPeopleService $ldapPeopleService,
     LdapNetgroupService $ldapNetgroupService,
+    LdapSudoService $ldapSudoService,
     NetgroupRepository $netgroupRepository,
-    PeopleRepository $peopleRepository
+    PeopleRepository $peopleRepository,
+    SudoRepository $sudoRepository
     )
     {
         $this->ldap = Ldap::create('ext_ldap', [
@@ -27,8 +31,10 @@ class LdapService
 
         $this->ldapPeopleService = $ldapPeopleService;
         $this->ldapNetgroupService = $ldapNetgroupService;
+        $this->ldapSudoService = $ldapSudoService;
         $this->netgroupRepository = $netgroupRepository;
         $this->peopleRepository = $peopleRepository;
+        $this->sudoRepository = $sudoRepository;
     }
 
     public function findAll(array $criteria = [])
@@ -73,6 +79,10 @@ class LdapService
             case 'ou=netgroup,':
                 $entity = $this->netgroupRepository->findOneBy(array('name' => $ldap_result->getAttributes()["cn"]));
                 $this->ldapNetgroupService->updateNetgroupEntity($entity, $ldap_result);
+                break;
+            case 'ou=SUDOers,':
+                $entity = $this->sudoRepository->findOneBy(array('name' => $ldap_result->getAttributes()["cn"]));
+                $this->ldapSudoService->updateSudoEntity($entity, $ldap_result);
                 break;
         }
     }

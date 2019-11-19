@@ -36,6 +36,7 @@ class PeopleController extends AbstractController
     public function show(People $person): Response
     {
         $netgroups = $person->getNetgroup();
+        $sudoGroups = $person->getSudoGroup();
         
         $hosts = [];
         $parent_netgroup_arr = [];
@@ -53,6 +54,7 @@ class PeopleController extends AbstractController
         
         return $this->render('people/show.html.twig', [
             'person' => $person,
+            'sudo_groups' => $sudoGroups,
             'netgroups' => $netgroups->toArray(),
             'hosts' => $hosts,
             'parent_netgroup_arr' => $parent_netgroup_arr,

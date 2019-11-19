@@ -28,9 +28,15 @@ class Host
      */
     private $netgroups;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Sudo", mappedBy="host")
+     */
+    private $sudoGroup;
+
     public function __construct()
     {
         $this->netgroups = new ArrayCollection();
+        $this->sudoGroup = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -73,6 +79,43 @@ class Host
         if ($this->netgroups->contains($netgroup)) {
             $this->netgroups->removeElement($netgroup);
             $netgroup->removeHost($this);
+        }
+
+        return $this;
+    }
+
+    public function clearNetgroups(): self
+    {
+        foreach ($this->netgroups as $netgroup) {
+            $netgroup->removeHost($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Sudo[]
+     */
+    public function getSudoGroup(): Collection
+    {
+        return $this->sudoGroup;
+    }
+
+    public function addSudoGroup(Sudo $sudoGroup): self
+    {
+        if (!$this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup[] = $sudoGroup;
+            $sudoGroup->addHost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSudoGroup(Sudo $sudoGroup): self
+    {
+        if ($this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup->removeElement($sudoGroup);
+            $sudoGroup->removeHost($this);
         }
 
         return $this;

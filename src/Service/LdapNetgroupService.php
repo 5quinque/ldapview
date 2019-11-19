@@ -75,7 +75,7 @@ class LdapNetgroupService
     {
         $query = $this->ldap->query(
             "ou=netgroup,{$_ENV['LDAP_DC']}",
-            "(&(structuralObjectClass=nisNetgroup)(cn={$name}))",
+            "(&(objectClass=nisNetgroup)(cn={$name}))",
             ["maxItems" => 1]
         );
 

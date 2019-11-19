@@ -34,6 +34,7 @@ class HostController extends AbstractController
     public function show(Host $host): Response
     {
         $netgroups = $host->getNetgroups();
+        $sudoGroups = $host->getSudoGroup();
 
         $people = [];
         $child_netgroup_arr = [];
@@ -52,6 +53,7 @@ class HostController extends AbstractController
 
         return $this->render('host/show.html.twig', [
             'host' => $host,
+            'sudo_groups' => $sudoGroups,
             'netgroups' => $netgroups,
             'people' => $people,
             'child_netgroup_arr' => $child_netgroup_arr,

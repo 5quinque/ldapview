@@ -60,10 +60,11 @@ class loadEntitiesCommand extends Command
         }
         if ($this->netgroupOption) {
             $output->writeln('Netgroup');
-            $this->ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
+            $netgroups = $this->ldapService->findAll(["ou" => "netgroup", "objectClass" => "nisNetgroup"]);
         }
         if ($this->sudoOption) {
             $output->writeln('Sudo');
+            $sudoGroups = $this->ldapService->findAll(["ou" => "SUDOers", "objectClass" => "sudoRole"]);
         }
 
         $output->writeln('=================');

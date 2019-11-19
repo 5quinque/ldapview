@@ -52,12 +52,18 @@ class Netgroup
      */
     private $parent_netgroup;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Sudo", mappedBy="netgroup")
+     */
+    private $sudoGroup;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
         $this->people = new ArrayCollection();
         $this->child_netgroup = new ArrayCollection();
         $this->parent_netgroup = new ArrayCollection();
+        $this->sudoGroup = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +198,34 @@ class Netgroup
         if ($this->parent_netgroup->contains($parentNetgroup)) {
             $this->parent_netgroup->removeElement($parentNetgroup);
             $parentNetgroup->removeChildNetgroup($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Sudo[]
+     */
+    public function getSudoGroup(): Collection
+    {
+        return $this->sudoGroup;
+    }
+
+    public function addSudoGroup(Sudo $sudoGroup): self
+    {
+        if (!$this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup[] = $sudoGroup;
+            $sudoGroup->addNetgroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSudoGroup(Sudo $sudoGroup): self
+    {
+        if ($this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup->removeElement($sudoGroup);
+            $sudoGroup->removeNetgroup($this);
         }
 
         return $this;

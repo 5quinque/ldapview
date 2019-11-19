@@ -20,6 +20,9 @@
 {% elseif people is defined %}
 {% set items = people %}
 {% set item_count = people_count %}
+{% elseif sudogroups is defined %}
+{% set items = sudogroups %}
+{% set item_count = sudo_count %}
 {% endif %}
 <div class="row">
     <div class="col-sm-12 col-md-5">

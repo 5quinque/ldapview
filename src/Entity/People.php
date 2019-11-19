@@ -59,9 +59,15 @@ class People
      */
     private $netgroup;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Sudo", mappedBy="user")
+     */
+    private $sudoGroup;
+
     public function __construct()
     {
         $this->netgroup = new ArrayCollection();
+        $this->sudoGroup = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +169,34 @@ class People
     {
         if ($this->netgroup->contains($netgroup)) {
             $this->netgroup->removeElement($netgroup);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Sudo[]
+     */
+    public function getSudoGroup(): Collection
+    {
+        return $this->sudoGroup;
+    }
+
+    public function addSudoGroup(Sudo $sudoGroup): self
+    {
+        if (!$this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup[] = $sudoGroup;
+            $sudoGroup->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSudoGroup(Sudo $sudoGroup): self
+    {
+        if ($this->sudoGroup->contains($sudoGroup)) {
+            $this->sudoGroup->removeElement($sudoGroup);
+            $sudoGroup->removeUser($this);
         }
 
         return $this;

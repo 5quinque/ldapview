@@ -28,42 +28,21 @@
     <div class="sidebar-heading">
         LDAP
     </div>
-
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item {{ route in ['people_index', 'people_new'] ? 'active' }}">
-        <a class="nav-link {{ route not in ['people_index', 'people_new'] ? 'collapsed' }}" href="#"
-           data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
-           aria-controls="collapseTwo">
-            <i class="fa fa-fw fa-user"></i>
-            <span>People</span>
-        </a>
-        <div id="collapseTwo" class="collapse {{ route in ['people_index', 'people_new'] ? 'show' }}"
-             aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Actions:</h6>
-                <a class="collapse-item {{ route == 'people_index' ? 'active' }}"
-                   href="{{ path('people_index') }}">List</a>
-            </div>
-        </div>
+    <li class="nav-item {{ route in ['people_index', 'people_show'] ? 'active'}}">
+        <a class="nav-link" href="{{ path('people_index') }}">
+            <i class="fas fa-fw fa-user"></i>
+            <span>People</span></a>
     </li>
-
-    <!-- Nav Item - Utilities Collapse Menu -->
-    <li class="nav-item  {{ route in ['netgroup_index', 'netgroup_new'] ? 'active' }}">
-        <a class="nav-link  {{ route not in ['netgroup_index', 'netgroup_new'] ? 'collapsed' }}" href="#"
-           data-toggle="collapse" data-target="#collapseUtilities"
-           aria-expanded="true" aria-controls="collapseUtilities">
+    <li class="nav-item {{ route in ['netgroup_index', 'netgroup_show'] ? 'active'}}">
+        <a class="nav-link" href="{{ path('netgroup_index') }}">
             <i class="fas fa-fw fa-users"></i>
-            <span>Netgroups</span>
-        </a>
-        <div id="collapseUtilities" class="collapse {{ route in ['netgroup_index', 'netgroup_new'] ? 'show' }}"
-             aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Actions:</h6>
-                <a class="collapse-item {{ route == 'netgroup_index' ? 'active' }}" href="{{ path('netgroup_index') }}">List</a>
-            </div>
-        </div>
+            <span>Netgroups</span></a>
     </li>
-
+    <li class="nav-item {{ route in ['sudo_index', 'sudo_show'] ? 'active'}}">
+        <a class="nav-link" href="{{ path('sudo_index') }}">
+            <i class="fas fa-fw fa-user-lock"></i>
+            <span>Sudo Groups</span></a>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
@@ -71,14 +50,11 @@
     <div class="sidebar-heading">
         Other
     </div>
-
     <li class="nav-item {{ route in ['host_index', 'host_show'] ? 'active'}}">
         <a class="nav-link" href="{{ path('host_index') }}">
             <i class="fas fa-fw fa-server"></i>
             <span>Hosts</span></a>
     </li>
-
-
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
